@@ -1778,12 +1778,12 @@ const W = 430;
 const H = 720;
 
 const SAVE_KEY =
-  "LilVelluxFlappyGalaxy_v4";
+  "LilVelluxFlappyGalaxy_v5";
 
 const BACKUP_KEY =
-  "LilVelluxFlappyGalaxy_v4_backup";
+  "LilVelluxFlappyGalaxy_v5_backup";
 
-const SAVE_VERSION = 4;
+const SAVE_VERSION = 5;
 
 
 /* ============================================================
@@ -1838,6 +1838,10 @@ const DEFAULT_SAVE = {
   totalCoins: 0,
   totalGems: 0,
 
+  casesOpened: 0,
+  bossesDefeated: 0,
+  upgradesBought: 0,
+
   gamesPlayed: 0,
 
   totalScore: 0,
@@ -1876,7 +1880,12 @@ const DEFAULT_SAVE = {
     gems10: 0,
     combo10: 0,
     powerups20: 0,
-    meteors10: 0
+    meteors10: 0,
+    boss3: 0,
+    cases5: 0,
+    upgrades5: 0,
+    score150: 0,
+    gems5: 0
 
   },
 
@@ -1889,7 +1898,12 @@ const DEFAULT_SAVE = {
     gems10: false,
     combo10: false,
     powerups20: false,
-    meteors10: false
+    meteors10: false,
+    boss3: false,
+    cases5: false,
+    upgrades5: false,
+    score150: false,
+    gems5: false
 
   },
 
@@ -2292,8 +2306,47 @@ const SKINS = {
     color: "#64ffcc",
     price: 40000,
     gemPrice: 0
-  }
+  },
 
+  aurora: {
+    name: "Aurora",
+    icon: "🌈",
+    color: "#8ffff0",
+    price: 65000,
+    gemPrice: 0
+  },
+
+  void: {
+    name: "Void",
+    icon: "🕳️",
+    color: "#9d7cff",
+    price: 90000,
+    gemPrice: 0
+  },
+
+  solar: {
+    name: "Solar",
+    icon: "☀️",
+    color: "#ff9f43",
+    price: 125000,
+    gemPrice: 0
+  },
+
+  comet: {
+    name: "Comet",
+    icon: "☄️",
+    color: "#7de7ff",
+    price: 175000,
+    gemPrice: 0
+  },
+
+  starlord: {
+    name: "Star Lord",
+    icon: "🛸",
+    color: "#f7f7ff",
+    price: 250000,
+    gemPrice: 0
+  }
 };
 
 
@@ -2315,7 +2368,7 @@ const CASES = {
       { type: "coins", amount: 100, weight: 43, label: "100 COINS", icon: "🪙", tier: "common" },
       { type: "coins", amount: 250, weight: 28, label: "250 COINS", icon: "🪙", tier: "common" },
       { type: "coins", amount: 750, weight: 10, label: "750 GOLD", icon: "🥇", tier: "gold" },
-      { type: "gems", amount: 3, weight: 14, label: "3 DIAMONDS", icon: "💎", tier: "rare" },
+      { type: "gems", amount: 3, weight: 3, label: "3 DIAMONDS", icon: "💎", tier: "rare" },
       { type: "skin", key: "ruby", weight: 5, label: "RUBY SKIN", icon: "🔥", tier: "rare" }
     ]
   },
@@ -2330,7 +2383,7 @@ const CASES = {
       { type: "coins", amount: 800, weight: 20, label: "800 COINS", icon: "🪙", tier: "common" },
       { type: "coins", amount: 2500, weight: 16, label: "2,500 GOLD", icon: "🥇", tier: "gold" },
       { type: "coins", amount: 5000, weight: 5, label: "5,000 GOLD JACKPOT", icon: "🏆", tier: "gold" },
-      { type: "gems", amount: 10, weight: 17, label: "10 DIAMONDS", icon: "💎", tier: "rare" },
+      { type: "gems", amount: 10, weight: 4, label: "10 DIAMONDS", icon: "💎", tier: "rare" },
       { type: "skin", key: "ocean", weight: 8, label: "OCEAN SKIN", icon: "🌊", tier: "rare" },
       { type: "skin", key: "toxic", weight: 7, label: "TOXIC SKIN", icon: "☢️", tier: "rare" }
     ]
@@ -2346,7 +2399,7 @@ const CASES = {
       { type: "coins", amount: 2000, weight: 17, label: "2,000 COINS", icon: "🪙", tier: "common" },
       { type: "coins", amount: 5000, weight: 18, label: "5,000 GOLD", icon: "🥇", tier: "gold" },
       { type: "coins", amount: 10000, weight: 8, label: "10,000 GOLD JACKPOT", icon: "👑", tier: "gold" },
-      { type: "gems", amount: 25, weight: 15, label: "25 DIAMONDS", icon: "💎", tier: "rare" },
+      { type: "gems", amount: 25, weight: 3, label: "25 DIAMONDS", icon: "💎", tier: "rare" },
       { type: "skin", key: "cosmic", weight: 8, label: "COSMIC SKIN", icon: "🌌", tier: "rare" },
       { type: "skin", key: "golden", weight: 7, label: "GOLDEN SKIN", icon: "👑", tier: "gold" },
       { type: "skin", key: "neon", weight: 5, label: "NEON SKIN", icon: "💠", tier: "rare" }
@@ -2425,13 +2478,21 @@ function buildCaseReel(caseInfo, winner) {
 
 
 let activeCaseOpening = false;
+let pendingCaseReward = null;
+let pendingCaseInfo = null;
 
 function finishCaseReward(reward, caseInfo) {
+  // Rewards are deliberately applied only when the player presses
+  // COLLECT REWARD. This prevents the old "button does nothing"
+  // behavior and makes the case result a real claim step.
+  if (!reward || !caseInfo) return;
+
   if (reward.type === "coins") {
     save.coins += reward.amount;
   }
   else if (reward.type === "gems") {
     save.gems += reward.amount;
+    save.totalGems += reward.amount;
   }
   else if (reward.type === "skin") {
     const alreadyOwned = save.skins.unlocked.includes(reward.key);
@@ -2446,6 +2507,15 @@ function finishCaseReward(reward, caseInfo) {
     }
   }
 
+  save.casesOpened++;
+  unlockAchievement("case1");
+  if (save.casesOpened >= 5) unlockAchievement("case5");
+  if (save.casesOpened >= 10) unlockAchievement("case10");
+
+  pendingCaseReward = null;
+  pendingCaseInfo = null;
+  activeCaseOpening = false;
+
   saveGame();
   renderShop();
   updateUI();
@@ -2458,7 +2528,7 @@ function showCaseWinner(reward, caseInfo) {
   const button = document.getElementById("caseContinueBtn");
 
   let title = caseRewardLabel(reward);
-  let sub = "REWARD ADDED TO YOUR ACCOUNT";
+  let sub = "REWARD READY TO CLAIM";
 
   if (reward._duplicate) {
     title = `${caseRewardIcon(reward)} DUPLICATE SKIN`;
@@ -2511,6 +2581,8 @@ function openCase(key) {
   updateUI();
 
   const reward = pickCaseReward(caseInfo);
+  pendingCaseReward = reward;
+  pendingCaseInfo = caseInfo;
   activeCaseOpening = true;
 
   const overlay = document.getElementById("caseOpeningOverlay");
@@ -2557,11 +2629,24 @@ function openCase(key) {
 
   setTimeout(() => {
     if (!activeCaseOpening) return;
-    finishCaseReward(reward, caseInfo);
     showCaseWinner(reward, caseInfo);
   }, 3300);
 }
 
+
+
+document.getElementById("caseContinueBtn").addEventListener("click", () => {
+  if (!activeCaseOpening || !pendingCaseReward || !pendingCaseInfo) return;
+
+  const reward = pendingCaseReward;
+  const caseInfo = pendingCaseInfo;
+
+  finishCaseReward(reward, caseInfo);
+
+  document.getElementById("caseContinueBtn").classList.add("hidden");
+  closeCaseOpening();
+  showToast(`✨ ${caseRewardLabel(reward)} COLLECTED!`);
+});
 
 
 /* ============================================================
@@ -2720,8 +2805,47 @@ const MISSIONS = [
     description: "Survive 10 meteor encounters.",
     max: 10,
     reward: 800
-  }
+  },
 
+  {
+    key: "boss3",
+    name: "Boss Breaker",
+    description: "Defeat 3 bosses.",
+    max: 3,
+    reward: 1500
+  },
+
+  {
+    key: "cases5",
+    name: "Case Cracker",
+    description: "Collect rewards from 5 cases.",
+    max: 5,
+    reward: 1200
+  },
+
+  {
+    key: "upgrades5",
+    name: "Built Different",
+    description: "Buy 5 upgrades.",
+    max: 5,
+    reward: 1000
+  },
+
+  {
+    key: "score150",
+    name: "Deep Space",
+    description: "Reach a score of 150.",
+    max: 150,
+    reward: 1800
+  },
+
+  {
+    key: "gems5",
+    name: "Diamond Prospect",
+    description: "Collect 5 diamonds.",
+    max: 5,
+    reward: 1200
+  }
 ];
 
 
@@ -2791,7 +2915,7 @@ const ACHIEVEMENTS = [
     key: "boss",
     icon: "👾",
     name: "Boss Hunter",
-    description: "Survive a boss encounter."
+    description: "Defeat a boss by landing laser shots."
   },
 
   {
@@ -2799,8 +2923,56 @@ const ACHIEVEMENTS = [
     icon: "🌌",
     name: "Beyond The Stars",
     description: "Reach score 250."
-  }
+  },
 
+  {
+    key: "case1",
+    icon: "📦",
+    name: "First Pull",
+    description: "Collect a reward from your first case."
+  },
+
+  {
+    key: "case5",
+    icon: "🎁",
+    name: "Case Veteran",
+    description: "Collect rewards from 5 cases."
+  },
+
+  {
+    key: "case10",
+    icon: "🧰",
+    name: "Case Collector",
+    description: "Collect rewards from 10 cases."
+  },
+
+  {
+    key: "boss3",
+    icon: "💥",
+    name: "Boss Breaker",
+    description: "Defeat 3 bosses."
+  },
+
+  {
+    key: "upgrade5",
+    icon: "🔧",
+    name: "Tuned Up",
+    description: "Buy 5 upgrades."
+  },
+
+  {
+    key: "flaps1000",
+    icon: "🪽",
+    name: "Wing Veteran",
+    description: "Flap 1,000 times."
+  },
+
+  {
+    key: "gems50",
+    icon: "💎",
+    name: "Diamond Vault",
+    description: "Collect 50 diamonds."
+  }
 ];
 
 
@@ -2822,6 +2994,7 @@ let particles = [];
 let stars = [];
 let clouds = [];
 let shockwaves = [];
+let bossShots = [];
 
 let score = 0;
 let runCoins = 0;
@@ -3314,6 +3487,10 @@ function flap() {
 
   save.totalFlaps++;
 
+  if (save.totalFlaps >= 1000) {
+    unlockAchievement("flaps1000");
+  }
+
   const skin =
     SKINS[
       save.skins.equipped
@@ -3327,6 +3504,19 @@ function flap() {
   );
 
   playSound("flap");
+
+  // During a boss encounter, every player flap/tap also fires a laser.
+  // The player must actively attack instead of waiting for the boss.
+  if (boss && boss.active) {
+    bossShots.push({
+      x: bird.x + 22,
+      y: bird.y,
+      vx: 10 + save.upgrades.dash * .7,
+      damage: 1 + Math.floor(save.upgrades.dash / 2),
+      life: 80
+    });
+    playSound("power");
+  }
 
 }
 
@@ -3486,9 +3676,11 @@ function createPipe() {
      Chance for a gem.
   */
 
+  // Diamonds are intentionally rare. Luck improves the odds, but
+  // even a fully upgraded pilot should still see them infrequently.
   const gemChance =
-    .055 +
-    save.upgrades.luck * .012;
+    .015 +
+    save.upgrades.luck * .003;
 
   if (
     Math.random() <
@@ -3640,10 +3832,10 @@ function spawnBoss() {
       H / 2,
 
     hp:
-      3,
+      8 + Math.floor(score / 75),
 
     maxHp:
-      3,
+      8 + Math.floor(score / 75),
 
     t: 0,
 
@@ -3847,6 +4039,10 @@ function addScorePoint() {
 
   }
 
+  if (score >= 150) {
+    save.missions.score150 = Math.min(150, score);
+  }
+
   if (
     score >= 250
   ) {
@@ -3896,7 +4092,7 @@ function collectPowerup(
     case "magnet":
 
       magnetTimer =
-        480;
+        480 + save.upgrades.magnet * 60;
 
       showToast(
         "🧲 MAGNET ACTIVE!"
@@ -3907,7 +4103,7 @@ function collectPowerup(
     case "slow":
 
       slowTimer =
-        360;
+        360 + save.upgrades.slow * 45;
 
       showToast(
         "⏱️ TIME WARP!"
@@ -3918,7 +4114,7 @@ function collectPowerup(
     case "double":
 
       coinDoubleTimer =
-        420;
+        420 + save.upgrades.coin * 35;
 
       showToast(
         "🪙 2X COINS!"
@@ -3933,7 +4129,7 @@ function collectPowerup(
       dashActive = true;
 
       dashTimer =
-        35;
+        35 + save.upgrades.dash * 4;
 
       showToast(
         "💨 BOOST!"
@@ -4006,6 +4202,10 @@ function collectGem(
   unlockAchievement(
     "gems25"
   );
+
+  if (save.totalGems >= 50) {
+    unlockAchievement("gems50");
+  }
 
   createParticles(
     gem.x,
@@ -4200,6 +4400,21 @@ function updateMissionProgress() {
       10,
       save.gamesPlayed
     );
+
+  save.missions.boss3 =
+    Math.min(3, save.bossesDefeated);
+
+  save.missions.cases5 =
+    Math.min(5, save.casesOpened);
+
+  save.missions.upgrades5 =
+    Math.min(5, save.upgradesBought);
+
+  save.missions.score150 =
+    Math.min(150, save.highScore);
+
+  save.missions.gems5 =
+    Math.min(5, save.totalGems);
 
 }
 
@@ -5187,6 +5402,61 @@ function update(
     boss.active
   ) {
 
+    // Move and resolve player laser shots against the boss.
+    for (const shot of bossShots) {
+      shot.x += shot.vx * dt;
+      shot.life -= dt;
+
+      if (
+        shot.life > 0 &&
+        circleCollision(
+          shot.x,
+          shot.y,
+          7,
+          boss.x,
+          boss.y,
+          45
+        )
+      ) {
+        boss.hp -= shot.damage;
+        shot.life = 0;
+
+        createParticles(
+          boss.x,
+          boss.y,
+          "#62f6ff",
+          18,
+          1.2
+        );
+
+        createShockwave(
+          boss.x,
+          boss.y,
+          "#62f6ff"
+        );
+
+        playSound("hit");
+
+        if (boss.hp <= 0) {
+          boss.active = false;
+          boss.hp = 0;
+          bossShots = [];
+          save.bossesDefeated++;
+          save.missions.boss3 = Math.min(3, save.bossesDefeated);
+          score += 10;
+          unlockAchievement("boss");
+          if (save.bossesDefeated >= 3) unlockAchievement("boss3");
+          checkMissionRewards();
+          queueSave();
+          showToast("👾 BOSS DESTROYED! +10");
+        }
+      }
+    }
+
+    bossShots = bossShots.filter(
+      shot => shot.life > 0 && shot.x < W + 80
+    );
+
     boss.t +=
       .025 *
       dt;
@@ -5279,6 +5549,10 @@ function update(
 
     }
 
+  }
+
+  if (boss && !boss.active) {
+    boss = null;
   }
 
   /*
@@ -6253,6 +6527,27 @@ function drawUFOs() {
    BOSS
    ============================================================ */
 
+function drawBossShots() {
+  if (!bossShots.length) return;
+
+  ctx.save();
+
+  for (const shot of bossShots) {
+    ctx.shadowColor = "#62f6ff";
+    ctx.shadowBlur = 12;
+    ctx.strokeStyle = "#62f6ff";
+    ctx.lineWidth = 4;
+
+    ctx.beginPath();
+    ctx.moveTo(shot.x - 16, shot.y);
+    ctx.lineTo(shot.x + 10, shot.y);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+
 function drawBoss() {
 
   if (
@@ -6855,6 +7150,7 @@ function draw() {
   drawUFOs();
 
   drawBoss();
+  drawBossShots();
 
   drawCoins();
 
@@ -7406,6 +7702,11 @@ function buyUpgrade(
     cost;
 
   save.upgrades[key]++;
+  save.upgradesBought++;
+  save.missions.upgrades5 = Math.min(5, save.upgradesBought);
+  if (save.upgradesBought >= 5) {
+    unlockAchievement("upgrade5");
+  }
 
   saveGame();
 
@@ -7483,6 +7784,32 @@ function buySkin(
 }
 
 
+function upgradeEffectText(key, level) {
+  const next = level + 1;
+
+  switch (key) {
+    case "jump":
+      return `Flap: ${(-8 - level * .7).toFixed(1)} → ${(-8 - next * .7).toFixed(1)} power`;
+    case "coin":
+      return `Coins: +${level} → +${next} per pickup`;
+    case "shield":
+      return `Starting shields: ${level} → ${next}`;
+    case "magnet":
+      return `Magnet range: ${42 + level * 38}px → ${42 + next * 38}px`;
+    case "slow":
+      return `Travel reduction: ${Math.round(level * 3.5)}% → ${Math.round(next * 3.5)}%`;
+    case "dash":
+      return `Dash power/cooldown improves to level ${next}`;
+    case "luck":
+      return `Diamond chance: ${((.015 + level * .003) * 100).toFixed(1)}% → ${((.015 + next * .003) * 100).toFixed(1)}%`;
+    case "revive":
+      return `Revive charges: ${level} → ${next}`;
+    default:
+      return `Level ${level} → ${next}`;
+  }
+}
+
+
 function renderShop() {
 
   const upgradeGrid =
@@ -7540,6 +7867,10 @@ function renderShop() {
 
         <p>
           LEVEL ${level}/${info.max}
+        </p>
+
+        <p style="color:#65f6ff">
+          ${maxed ? "MAX EFFECT REACHED" : upgradeEffectText(key, level)}
         </p>
 
         <button
