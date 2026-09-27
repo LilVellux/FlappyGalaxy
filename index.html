@@ -1,0 +1,3949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#050814">
+<meta name="description" content="Flappy Galaxy — LilVellux Edition">
+<title>Flappy Galaxy — LilVellux</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 15%, #263e86 0%, transparent 30%),
+    radial-gradient(circle at 80% 85%, #652276 0%, transparent 30%),
+    #050814;
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button,
+a {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+button,
+.socialCard {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+#gameWrap {
+  position: relative;
+  width: min(430px, 96vw);
+  max-height: 98vh;
+  aspect-ratio: 430 / 720;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 26px;
+  background: #091331;
+  box-shadow:
+    0 30px 90px rgba(0,0,0,.7),
+    0 0 50px rgba(93,125,255,.18);
+  touch-action: manipulation;
+}
+
+#ui {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.topbar {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  z-index: 20;
+}
+
+.badge {
+  padding: 9px 13px;
+  border-radius: 15px;
+  background: rgba(5,10,30,.72);
+  border: 1px solid rgba(255,255,255,.14);
+  backdrop-filter: blur(12px);
+  font-weight: 800;
+  box-shadow: 0 6px 25px rgba(0,0,0,.2);
+}
+
+#score {
+  position: absolute;
+  top: 65px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 58px;
+  line-height: 1;
+  font-weight: 1000;
+  text-shadow: 0 6px 18px rgba(0,0,0,.55);
+  z-index: 10;
+  pointer-events: none;
+}
+
+#pauseButton {
+  position: absolute;
+  right: 14px;
+  top: 58px;
+  width: auto;
+  min-width: 44px;
+  height: 44px;
+  padding: 8px 12px;
+  margin: 0;
+  display: none;
+  z-index: 30;
+}
+
+#screen {
+  position: absolute;
+  inset: 0;
+  padding: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.panel {
+  width: 100%;
+  max-height: 94%;
+  overflow: hidden;
+  padding: 24px;
+  border-radius: 26px;
+  text-align: center;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(13,21,51,.97),
+      rgba(8,12,29,.95)
+    );
+  border: 1px solid rgba(255,255,255,.13);
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.55),
+    inset 0 1px rgba(255,255,255,.04);
+  backdrop-filter: blur(20px);
+  pointer-events: auto;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.logo {
+  font-size: 42px;
+  line-height: .92;
+  font-weight: 1000;
+  letter-spacing: -2px;
+  background: linear-gradient(
+    90deg,
+    #62eaff,
+    #8d7cff,
+    #ff71d5
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 9px;
+}
+
+.subtitle {
+  color: #9da9c8;
+  font-size: 14px;
+  line-height: 1.45;
+  margin-bottom: 18px;
+}
+
+button {
+  width: 100%;
+  min-height: 46px;
+  margin: 5px 0;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 14px;
+  color: white;
+  background: linear-gradient(135deg,#667cff,#995bff);
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  transition:
+    transform .12s ease,
+    filter .12s ease,
+    opacity .12s ease,
+    box-shadow .12s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+button:active {
+  transform: scale(.98);
+}
+
+button:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+}
+
+button.secondary {
+  background: #202a46;
+}
+
+button.gold {
+  color: #241700;
+  background: linear-gradient(135deg,#f4a62a,#ffdb65);
+}
+
+button.green {
+  color: #061d14;
+  background: linear-gradient(135deg,#43e49b,#8affbf);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin: 15px 0;
+}
+
+.stat {
+  padding: 12px;
+  border-radius: 15px;
+  background: rgba(255,255,255,.055);
+  border: 1px solid rgba(255,255,255,.055);
+}
+
+.stat small {
+  display: block;
+  margin-bottom: 4px;
+  color: #8f9bb9;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.stat strong {
+  font-size: 21px;
+}
+
+.scrollArea {
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 3px;
+  scrollbar-width: thin;
+  scrollbar-color: #5568a8 transparent;
+}
+
+.shopTitle {
+  margin: 17px 0 8px;
+  text-align: left;
+  color: #aeb9d5;
+  font-size: 12px;
+  letter-spacing: 1px;
+  font-weight: 900;
+}
+
+.shopGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+
+.shopItem {
+  min-width: 0;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.055);
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.shopIcon {
+  font-size: 34px;
+  line-height: 1.1;
+}
+
+.shopItem h3 {
+  margin: 6px 0 4px;
+  font-size: 14px;
+}
+
+.shopItem p {
+  margin: 3px 0;
+  color: #9ba7c2;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.shopItem button {
+  min-height: 36px;
+  padding: 8px;
+  margin-top: 7px;
+  font-size: 11px;
+}
+
+.mission {
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 14px;
+  text-align: left;
+  background: rgba(255,255,255,.055);
+}
+
+.missionTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.missionName {
+  font-weight: 900;
+}
+
+.missionDescription {
+  margin-top: 4px;
+  color: #9ca8c4;
+  font-size: 11px;
+}
+
+.progress {
+  height: 7px;
+  margin-top: 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #242c43;
+}
+
+.progress > div {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg,#4edfff,#a56cff);
+}
+
+#gameOverPanel .bigResult {
+  font-size: 45px;
+  font-weight: 1000;
+  margin: 5px 0 15px;
+}
+
+.newBest {
+  min-height: 20px;
+  color: #ffd84c;
+  font-weight: 900;
+  font-size: 13px;
+}
+
+.hint {
+  color: #7f8baa;
+  font-size: 11px;
+  margin-top: 10px;
+}
+
+
+/* ============================================================
+   SOCIAL HUB
+   ============================================================ */
+
+.socialHub {
+  position: relative;
+  overflow: hidden;
+  padding: 2px 0 0;
+}
+
+.socialHubGlow {
+  position: absolute;
+  top: -125px;
+  left: 50%;
+  width: 270px;
+  height: 270px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle,
+      rgba(121,103,255,.28),
+      transparent 68%
+    );
+  pointer-events: none;
+}
+
+.socialAvatar {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background:
+    linear-gradient(
+      135deg,
+      #62eaff,
+      #8d7cff,
+      #ff71d5
+    );
+  box-shadow:
+    0 0 30px rgba(115,130,255,.45);
+  font-size: 30px;
+}
+
+.socialHubTitle {
+  position: relative;
+  font-size: 31px;
+  line-height: 1;
+  font-weight: 1000;
+  letter-spacing: -1px;
+  background:
+    linear-gradient(
+      90deg,
+      #62eaff,
+      #8d7cff,
+      #ff71d5
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.socialHubHandle {
+  margin-top: 5px;
+  color: #c6cce0;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.socialHubSubtitle {
+  margin-top: 7px;
+  color: #858fac;
+  font-size: 11px;
+}
+
+.socialHubStats {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 7px;
+  margin-top: 15px;
+}
+
+.socialHubStats > div {
+  padding: 9px 5px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.07);
+}
+
+.socialHubStats strong {
+  display: block;
+  color: white;
+  font-size: 11px;
+  font-weight: 1000;
+}
+
+.socialHubStats span {
+  display: block;
+  margin-top: 3px;
+  color: #747f9c;
+  font-size: 8px;
+}
+
+.socialHubDivider {
+  height: 1px;
+  margin: 14px 0 12px;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,.13),
+      transparent
+    );
+}
+
+.socialHubLabel {
+  margin-bottom: 8px;
+  color: #8995b3;
+  font-size: 10px;
+  font-weight: 1000;
+  letter-spacing: 1.5px;
+}
+
+.socialHubGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: #5568a8 transparent;
+}
+
+.socialCard {
+  position: relative;
+  min-width: 0;
+  min-height: 70px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  overflow: hidden;
+  border-radius: 15px;
+  color: white;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,.08);
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    border-color .15s ease;
+}
+
+.socialCard:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.12);
+  border-color: rgba(255,255,255,.2);
+}
+
+.socialCard:active {
+  transform: scale(.98);
+}
+
+.socialCardIcon {
+  flex: 0 0 37px;
+  width: 37px;
+  height: 37px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  background: rgba(255,255,255,.13);
+  font-size: 19px;
+  font-weight: 1000;
+}
+
+.socialCardText {
+  min-width: 0;
+  text-align: left;
+}
+
+.socialCardText strong {
+  display: block;
+  color: white;
+  font-size: 12px;
+  font-weight: 1000;
+}
+
+.socialCardText span {
+  display: block;
+  margin-top: 2px;
+  color: rgba(255,255,255,.75);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.socialCardText small {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: rgba(255,255,255,.48);
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.socialArrow {
+  margin-left: auto;
+  color: rgba(255,255,255,.55);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.socialCard.tiktok {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(15,15,18,.95),
+      rgba(40,40,45,.9)
+    );
+}
+
+.socialCard.twitter {
+  background:
+    linear-gradient(
+      135deg,
+      #101b2d,
+      #1d2c48
+    );
+}
+
+.socialCard.youtube {
+  background:
+    linear-gradient(
+      135deg,
+      #65151e,
+      #9d1e2d
+    );
+}
+
+.socialCard.instagram {
+  background:
+    linear-gradient(
+      135deg,
+      #5c2292,
+      #d42e70,
+      #ee9632
+    );
+}
+
+.socialCard.twitch {
+  background:
+    linear-gradient(
+      135deg,
+      #4b2990,
+      #7046bd
+    );
+}
+
+.socialCard.snapchat {
+  color: #111;
+  background:
+    linear-gradient(
+      135deg,
+      #fff900,
+      #fff200
+    );
+}
+
+.socialCard.snapchat .socialCardText strong {
+  color: #111;
+}
+
+.socialCard.snapchat .socialCardText span {
+  color: rgba(0,0,0,.7);
+}
+
+.socialCard.snapchat .socialCardText small {
+  color: rgba(0,0,0,.5);
+}
+
+.socialCard.snapchat .socialArrow {
+  color: rgba(0,0,0,.6);
+}
+
+.socialHubFooter {
+  margin-top: 9px;
+  color: #596581;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .5px;
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-height:720px) {
+
+  body {
+    align-items: flex-start;
+    padding-top: 6px;
+  }
+
+  .panel {
+    padding: 18px;
+  }
+
+  .logo {
+    font-size: 34px;
+  }
+
+  .scrollArea {
+    max-height: 270px;
+  }
+
+  .socialHubGrid {
+    max-height: 245px;
+  }
+}
+
+@media (max-width:350px) {
+
+  #screen {
+    padding: 14px;
+  }
+
+  .panel {
+    padding: 17px;
+  }
+
+  .logo {
+    font-size: 34px;
+  }
+
+  .socialHubTitle {
+    font-size: 27px;
+  }
+
+  .socialHubGrid {
+    gap: 6px;
+  }
+
+  .socialCard {
+    min-height: 64px;
+    padding: 8px;
+    gap: 6px;
+  }
+
+  .socialCardIcon {
+    flex-basis: 32px;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .socialCardText strong {
+    font-size: 10px;
+  }
+
+  .socialCardText span {
+    font-size: 8px;
+  }
+
+  .socialCardText small,
+  .socialArrow {
+    display: none;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="gameWrap">
+
+  <canvas
+    id="game"
+    width="430"
+    height="720"
+  ></canvas>
+
+  <div id="ui">
+
+    <!-- ==================================================
+         TOP BAR
+         ================================================== -->
+
+    <div class="topbar">
+
+      <div class="badge">
+        🪙 <span id="coins">0</span>
+      </div>
+
+      <div class="badge">
+        🏆 <span id="highScore">0</span>
+      </div>
+
+    </div>
+
+    <button
+      id="pauseButton"
+      class="secondary"
+      type="button"
+      aria-label="Pause game"
+    >Ⅱ</button>
+
+    <div id="score">0</div>
+
+
+    <div id="screen">
+
+      <!-- ==================================================
+           MAIN MENU
+           ================================================== -->
+
+      <div
+        class="panel"
+        id="menuPanel"
+      >
+
+        <div class="logo">
+          FLAPPY<br>GALAXY
+        </div>
+
+        <div class="subtitle">
+          Fly farther. Collect coins. Unlock the galaxy.
+        </div>
+
+        <div class="stats">
+
+          <div class="stat">
+            <small>BEST SCORE</small>
+            <strong id="menuBest">0</strong>
+          </div>
+
+          <div class="stat">
+            <small>COINS</small>
+            <strong id="menuCoins">0</strong>
+          </div>
+
+        </div>
+
+        <button
+          id="playBtn"
+          type="button"
+        >
+          🚀 PLAY
+        </button>
+
+        <button
+          id="shopBtn"
+          class="gold"
+          type="button"
+        >
+          🛒 SHOP & UPGRADES
+        </button>
+
+        <button
+          id="missionsBtn"
+          class="secondary"
+          type="button"
+        >
+          🎯 MISSIONS
+        </button>
+
+        <button
+          id="creditsBtn"
+          class="secondary"
+          type="button"
+        >
+          🌐 SOCIAL HUB
+        </button>
+
+        <div class="hint">
+          SPACE / ↑ / TAP to flap
+        </div>
+
+      </div>
+
+
+      <!-- ==================================================
+           SHOP
+           ================================================== -->
+
+      <div
+        class="panel hidden"
+        id="shopPanel"
+      >
+
+        <div
+          class="logo"
+          style="font-size:34px"
+        >
+          UPGRADES
+        </div>
+
+        <div class="subtitle">
+          Spend your coins and customize your bird.
+        </div>
+
+        <div class="badge">
+          🪙 <span id="shopCoins">0</span>
+        </div>
+
+        <div class="scrollArea">
+
+          <div class="shopTitle">
+            POWER UP
+          </div>
+
+          <div
+            id="upgradeGrid"
+            class="shopGrid"
+          ></div>
+
+          <div class="shopTitle">
+            BIRD SKINS
+          </div>
+
+          <div
+            id="skinGrid"
+            class="shopGrid"
+          ></div>
+
+        </div>
+
+        <button
+          id="backShop"
+          class="secondary"
+          type="button"
+        >
+          ← BACK
+        </button>
+
+      </div>
+
+
+      <!-- ==================================================
+           MISSIONS
+           ================================================== -->
+
+      <div
+        class="panel hidden"
+        id="missionsPanel"
+      >
+
+        <div
+          class="logo"
+          style="font-size:34px"
+        >
+          MISSIONS
+        </div>
+
+        <div class="subtitle">
+          Complete challenges and earn bonus coins.
+        </div>
+
+        <div id="missionList"></div>
+
+        <button
+          id="backMissions"
+          class="secondary"
+          type="button"
+        >
+          ← BACK
+        </button>
+
+      </div>
+
+
+      <!-- ==================================================
+           SOCIAL HUB
+           ================================================== -->
+
+      <div
+        class="panel hidden"
+        id="creditsPanel"
+      >
+
+        <div class="socialHub">
+
+          <div class="socialHubGlow"></div>
+
+          <div class="socialAvatar">
+            ✨
+          </div>
+
+          <div class="socialHubTitle">
+            LILVELLUX
+          </div>
+
+          <div class="socialHubHandle">
+            @LilVellux
+          </div>
+
+          <div class="socialHubSubtitle">
+            🚀 Follow the creator behind Flappy Galaxy
+          </div>
+
+          <div class="socialHubStats">
+
+            <div>
+              <strong>FLAPPY</strong>
+              <span>Galaxy</span>
+            </div>
+
+            <div>
+              <strong id="totalFlaps">0</strong>
+              <span>Total Flaps</span>
+            </div>
+
+            <div>
+              <strong id="totalCoins">0</strong>
+              <span>Total Coins</span>
+            </div>
+
+          </div>
+
+          <div class="socialHubDivider"></div>
+
+          <div class="socialHubLabel">
+            FOLLOW ME EVERYWHERE
+          </div>
+
+          <div class="socialHubGrid">
+
+            <a
+              class="socialCard tiktok"
+              href="https://www.tiktok.com/@LilVellux"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+
+              <div class="socialCardIcon">
+                🎵
+              </div>
+
+              <div class="socialCardText">
+                <strong>TikTok</strong>
+                <span>@LilVellux</span>
+                <small>Short videos & clips</small>
+              </div>
+
+              <div class="socialArrow">
+                →
+              </div>
+
+            </a>
+
+
+            <a
+              class="socialCard twitter"
+              href="https://x.com/lilvellux"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+
+              <div class="socialCardIcon">
+                𝕏
+              </div>
+
+              <div class="socialCardText">
+                <strong>X / Twitter</strong>
+                <span>@lilvellux</span>
+                <small>Updates & announcements</small>
+              </div>
+
+              <div class="socialArrow">
+                →
+              </div>
+
+            </a>
+
+
+            <a
+              class="socialCard youtube"
+              href="https://www.youtube.com/@lilvellux"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+
+              <div class="socialCardIcon">
+                ▶
+              </div>
+
+              <div class="socialCardText">
+                <strong>YouTube</strong>
+                <span>@lilvellux</span>
+                <small>Videos & gaming content</small>
+              </div>
+
+              <div class="socialArrow">
+                →
+              </div>
+
+            </a>
+
+
+            <a
+              class="socialCard instagram"
+              href="https://www.instagram.com/lilvellux"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+
+              <div class="socialCardIcon">
+                📸
+              </div>
+
+              <div class="socialCardText">
+                <strong>Instagram</strong>
+                <span>@lilvellux</span>
+                <small>Photos, reels & stories</small>
+              </div>
+
+              <div class="socialArrow">
+                →
+              </div>
+
+            </a>
+
+
+            <a
+              class="socialCard twitch"
+              href="https://www.twitch.tv/lilvellux"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+
+              <div class="socialCardIcon">
+                🎮
+              </div>
+
+              <div class="socialCardText">
+                <strong>Twitch</strong>
+                <span>@lilvellux</span>
+                <small>Live gaming & streams</small>
+              </div>
+
+              <div class="socialArrow">
+                →
+              </div>
+
+            </a>
+
+
+            <a
+              class="socialCard snapchat"
+              href="https://www.snapchat.com/@reallilvellux"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+
+              <div class="socialCardIcon">
+                👻
+              </div>
+
+              <div class="socialCardText">
+                <strong>Snapchat</strong>
+                <span>@reallilvellux</span>
+                <small>Behind the scenes</small>
+              </div>
+
+              <div class="socialArrow">
+                →
+              </div>
+
+            </a>
+
+          </div>
+
+          <div class="socialHubFooter">
+            🌌 FLAPPY GALAXY • LILVELLUX EDITION
+          </div>
+
+        </div>
+
+        <button
+          id="backCredits"
+          class="secondary"
+          type="button"
+        >
+          ← BACK TO MENU
+        </button>
+
+      </div>
+
+
+      <!-- ==================================================
+           GAME OVER
+           ================================================== -->
+
+      <div
+        class="panel hidden"
+        id="gameOverPanel"
+      >
+
+        <div
+          class="logo"
+          style="font-size:34px"
+        >
+          RUN OVER
+        </div>
+
+        <div class="bigResult">
+          <span id="finalScore">0</span>
+        </div>
+
+        <div class="stats">
+
+          <div class="stat">
+            <small>RUN COINS</small>
+            <strong id="finalCoins">0</strong>
+          </div>
+
+          <div class="stat">
+            <small>BEST</small>
+            <strong id="finalBest">0</strong>
+          </div>
+
+        </div>
+
+        <div
+          class="newBest"
+          id="newBest"
+        ></div>
+
+        <button
+          id="retryBtn"
+          type="button"
+        >
+          🔥 PLAY AGAIN
+        </button>
+
+        <button
+          id="gameOverShop"
+          class="gold"
+          type="button"
+        >
+          🛒 UPGRADE
+        </button>
+
+        <button
+          id="menuBtn"
+          class="secondary"
+          type="button"
+        >
+          MENU
+        </button>
+
+      </div>
+
+
+      <!-- ==================================================
+           PAUSE
+           ================================================== -->
+
+      <div
+        class="panel hidden"
+        id="pausePanel"
+      >
+
+        <div
+          class="logo"
+          style="font-size:36px"
+        >
+          PAUSED
+        </div>
+
+        <div class="subtitle">
+          Take a breath. Your run is waiting.
+        </div>
+
+        <button
+          id="resumeBtn"
+          type="button"
+        >
+          ▶ RESUME
+        </button>
+
+        <button
+          id="pauseMenuBtn"
+          class="secondary"
+          type="button"
+        >
+          MENU
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<script>
+"use strict";
+
+
+/* ============================================================
+   GAME SETUP
+   ============================================================ */
+
+const canvas =
+  document.getElementById("game");
+
+const ctx =
+  canvas.getContext("2d");
+
+const W = canvas.width;
+const H = canvas.height;
+
+
+/* ============================================================
+   SAVE DATA
+   ============================================================ */
+
+const SAVE_KEY =
+  "LilVelluxFlappyGalaxy_v3";
+
+const DEFAULT_SAVE = {
+
+  coins: 0,
+  highScore: 0,
+  totalFlaps: 0,
+  totalCoins: 0,
+  gamesPlayed: 0,
+
+  upgrades: {
+    jump: 0,
+    coin: 0,
+    shield: 0,
+    magnet: 0,
+    slow: 0
+  },
+
+  skins: {
+    unlocked: ["classic"],
+    equipped: "classic"
+  },
+
+  missions: {
+    score25: 0,
+    coins50: 0,
+    games10: 0,
+    score50: 0
+  },
+
+  missionClaimed: {
+    score25: false,
+    coins50: false,
+    games10: false,
+    score50: false
+  }
+
+};
+
+
+function cloneDefault() {
+
+  return JSON.parse(
+    JSON.stringify(
+      DEFAULT_SAVE
+    )
+  );
+
+}
+
+
+function loadSave() {
+
+  try {
+
+    const raw =
+      localStorage.getItem(
+        SAVE_KEY
+      );
+
+    if (!raw) {
+      return cloneDefault();
+    }
+
+    const loaded =
+      JSON.parse(raw);
+
+    const base =
+      cloneDefault();
+
+    return {
+
+      ...base,
+      ...loaded,
+
+      upgrades: {
+        ...base.upgrades,
+        ...(loaded.upgrades || {})
+      },
+
+      skins: {
+        ...base.skins,
+        ...(loaded.skins || {})
+      },
+
+      missions: {
+        ...base.missions,
+        ...(loaded.missions || {})
+      },
+
+      missionClaimed: {
+        ...base.missionClaimed,
+        ...(loaded.missionClaimed || {})
+      }
+
+    };
+
+  } catch {
+
+    return cloneDefault();
+
+  }
+
+}
+
+
+let save =
+  loadSave();
+
+
+function saveGame() {
+
+  try {
+
+    localStorage.setItem(
+      SAVE_KEY,
+      JSON.stringify(save)
+    );
+
+  } catch {}
+
+}
+
+
+/* ============================================================
+   SKINS
+   ============================================================ */
+
+const SKINS = {
+
+  classic: {
+    name: "Classic",
+    icon: "🐤",
+    color: "#ffe45e",
+    price: 0
+  },
+
+  ruby: {
+    name: "Ruby",
+    icon: "🔥",
+    color: "#ff4d6d",
+    price: 100
+  },
+
+  ocean: {
+    name: "Ocean",
+    icon: "🌊",
+    color: "#43d9ff",
+    price: 250
+  },
+
+  toxic: {
+    name: "Toxic",
+    icon: "☢️",
+    color: "#8cff52",
+    price: 500
+  },
+
+  cosmic: {
+    name: "Cosmic",
+    icon: "🌌",
+    color: "#b78cff",
+    price: 1000
+  },
+
+  golden: {
+    name: "Golden",
+    icon: "👑",
+    color: "#ffd54a",
+    price: 2500
+  },
+
+  neon: {
+    name: "Neon",
+    icon: "💠",
+    color: "#00fff2",
+    price: 5000
+  },
+
+  galaxy: {
+    name: "Galaxy",
+    icon: "🌠",
+    color: "#e68cff",
+    price: 10000
+  }
+
+};
+
+
+/* ============================================================
+   UPGRADES
+   ============================================================ */
+
+const UPGRADES = {
+
+  jump: {
+    name: "Jet Wings",
+    icon: "🚀",
+    description: "Increase flap power.",
+    max: 5,
+    base: 80
+  },
+
+  coin: {
+    name: "Coin Bonus",
+    icon: "🪙",
+    description: "Earn extra coins.",
+    max: 5,
+    base: 100
+  },
+
+  shield: {
+    name: "Shield",
+    icon: "🛡️",
+    description: "Begin runs with a shield.",
+    max: 3,
+    base: 180
+  },
+
+  magnet: {
+    name: "Coin Magnet",
+    icon: "🧲",
+    description: "Collect coins from farther away.",
+    max: 5,
+    base: 150
+  },
+
+  slow: {
+    name: "Time Warp",
+    icon: "⏱️",
+    description: "Slightly reduce pipe speed.",
+    max: 5,
+    base: 220
+  }
+
+};
+
+
+function upgradeCost(key) {
+
+  const level =
+    save.upgrades[key];
+
+  return (
+    UPGRADES[key].base *
+    (level + 1)
+  );
+
+}
+
+
+/* ============================================================
+   GAME STATE
+   ============================================================ */
+
+let gameState = "menu";
+
+let bird = null;
+
+let pipes = [];
+let coins = [];
+let particles = [];
+let stars = [];
+let clouds = [];
+
+let score = 0;
+let runCoins = 0;
+let frame = 0;
+let speed = 3;
+
+let shieldActive = false;
+
+let lastTime = 0;
+
+let audioContext = null;
+
+
+/* ============================================================
+   BACKGROUND OBJECTS
+   ============================================================ */
+
+for (let i = 0; i < 110; i++) {
+
+  stars.push({
+
+    x: Math.random() * W,
+    y: Math.random() * H,
+    r: Math.random() * 1.8 + .2,
+    speed: Math.random() * .5 + .05,
+    alpha: Math.random() * .8 + .2
+
+  });
+
+}
+
+
+for (let i = 0; i < 12; i++) {
+
+  clouds.push({
+
+    x: Math.random() * W,
+    y: Math.random() * H,
+    width: Math.random() * 100 + 50,
+    speed: Math.random() * .25 + .05,
+    alpha: Math.random() * .08 + .03
+
+  });
+
+}
+
+
+/* ============================================================
+   AUDIO
+   ============================================================ */
+
+function playSound(type) {
+
+  try {
+
+    if (!audioContext) {
+
+      audioContext =
+        new (
+          window.AudioContext ||
+          window.webkitAudioContext
+        )();
+
+    }
+
+    if (
+      audioContext.state ===
+      "suspended"
+    ) {
+
+      audioContext.resume();
+
+    }
+
+    const oscillator =
+      audioContext.createOscillator();
+
+    const gain =
+      audioContext.createGain();
+
+    oscillator.connect(gain);
+
+    gain.connect(
+      audioContext.destination
+    );
+
+    const sounds = {
+
+      flap: [430, .055],
+      coin: [900, .08],
+      score: [650, .1],
+      buy: [720, .1],
+      shield: [250, .16],
+      hit: [90, .25],
+      mission: [1100, .18]
+
+    };
+
+    const [
+      frequency,
+      duration
+    ] =
+      sounds[type] ||
+      sounds.flap;
+
+    oscillator.frequency.value =
+      frequency;
+
+    oscillator.type =
+      type === "hit"
+        ? "sawtooth"
+        : "sine";
+
+    gain.gain.setValueAtTime(
+      .06,
+      audioContext.currentTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      .001,
+      audioContext.currentTime +
+      duration
+    );
+
+    oscillator.start();
+
+    oscillator.stop(
+      audioContext.currentTime +
+      duration
+    );
+
+  } catch {}
+
+}
+
+
+/* ============================================================
+   PARTICLES
+   ============================================================ */
+
+function createParticles(
+  x,
+  y,
+  color,
+  amount = 10
+) {
+
+  for (
+    let i = 0;
+    i < amount;
+    i++
+  ) {
+
+    particles.push({
+
+      x,
+      y,
+
+      vx:
+        (Math.random() - .5) * 6,
+
+      vy:
+        (Math.random() - .5) * 6,
+
+      gravity: .08,
+
+      life: 1,
+
+      size:
+        Math.random() * 4 + 2,
+
+      color
+
+    });
+
+  }
+
+}
+
+
+/* ============================================================
+   START GAME
+   ============================================================ */
+
+function startGame() {
+
+  gameState = "playing";
+
+  score = 0;
+  runCoins = 0;
+  frame = 0;
+  speed = 3;
+
+  pipes = [];
+  coins = [];
+  particles = [];
+
+  bird = {
+
+    x: 105,
+    y: H / 2,
+    vy: 0,
+    rotation: 0
+
+  };
+
+  shieldActive =
+    save.upgrades.shield > 0;
+
+  save.gamesPlayed++;
+
+  updateMissionProgress();
+
+  saveGame();
+
+  hidePanels();
+
+  document.getElementById(
+    "pauseButton"
+  ).style.display = "block";
+
+  lastTime =
+    performance.now();
+
+  updateUI();
+
+}
+
+
+/* ============================================================
+   FLAP
+   ============================================================ */
+
+function flap() {
+
+  if (
+    gameState !==
+    "playing"
+  ) {
+    return;
+  }
+
+  const power =
+    -8 -
+    save.upgrades.jump * .7;
+
+  bird.vy =
+    power;
+
+  save.totalFlaps++;
+
+  const skin =
+    SKINS[
+      save.skins.equipped
+    ];
+
+  createParticles(
+    bird.x - 14,
+    bird.y + 8,
+    skin.color,
+    6
+  );
+
+  playSound("flap");
+
+}
+
+
+/* ============================================================
+   CREATE PIPE
+   ============================================================ */
+
+function createPipe() {
+
+  const gap =
+    Math.max(
+      160 - score * .9,
+      108
+    );
+
+  const margin = 80;
+
+  const available =
+    H -
+    gap -
+    margin * 2;
+
+  const top =
+    Math.random() *
+    available +
+    margin;
+
+  pipes.push({
+
+    x: W + 60,
+
+    width: 72,
+
+    top,
+
+    bottom:
+      top + gap,
+
+    passed: false
+
+  });
+
+
+  const coinCount =
+    score >= 30 ? 2 : 1;
+
+  for (
+    let i = 0;
+    i < coinCount;
+    i++
+  ) {
+
+    coins.push({
+
+      x:
+        W +
+        95 +
+        i * 38,
+
+      y:
+        top +
+        gap / 2 +
+        (i === 0 ? -20 : 20),
+
+      spin:
+        Math.random() * 6,
+
+      collected: false
+
+    });
+
+  }
+
+}
+
+
+/* ============================================================
+   COLLISION
+   ============================================================ */
+
+function pipeCollision(pipe) {
+
+  const radius = 17;
+
+  return (
+
+    bird.x + radius > pipe.x &&
+
+    bird.x - radius <
+      pipe.x + pipe.width &&
+
+    (
+      bird.y - radius < pipe.top ||
+      bird.y + radius > pipe.bottom
+    )
+
+  );
+
+}
+
+
+/* ============================================================
+   UPDATE
+   ============================================================ */
+
+function update(dt) {
+
+  if (
+    gameState !==
+    "playing"
+  ) {
+    return;
+  }
+
+  frame++;
+
+  const slowMultiplier =
+    1 -
+    save.upgrades.slow * .035;
+
+  speed =
+    (
+      3 +
+      Math.min(
+        score * .035,
+        2.8
+      )
+    ) *
+    slowMultiplier;
+
+
+  /* BIRD */
+
+  bird.vy +=
+    .43 * dt;
+
+  bird.y +=
+    bird.vy * dt;
+
+  bird.rotation =
+    Math.max(
+      -.5,
+      Math.min(
+        .85,
+        bird.vy * .055
+      )
+    );
+
+
+  /* PIPES */
+
+  if (
+    frame % 104 === 0
+  ) {
+    createPipe();
+  }
+
+
+  for (
+    const pipe of pipes
+  ) {
+
+    pipe.x -=
+      speed * dt;
+
+    if (
+      !pipe.passed &&
+      pipe.x + pipe.width < bird.x
+    ) {
+
+      pipe.passed = true;
+
+      score++;
+
+      save.missions.score25 =
+        Math.max(
+          save.missions.score25,
+          Math.min(score,25)
+        );
+
+      save.missions.score50 =
+        Math.max(
+          save.missions.score50,
+          Math.min(score,50)
+        );
+
+      createParticles(
+        bird.x,
+        bird.y,
+        "#ffffff",
+        12
+      );
+
+      playSound("score");
+
+      checkMissionRewards();
+
+    }
+
+
+    if (
+      pipeCollision(pipe)
+    ) {
+
+      if (shieldActive) {
+
+        shieldActive = false;
+
+        pipe.x = -300;
+
+        bird.vy = -7;
+
+        createParticles(
+          bird.x,
+          bird.y,
+          "#45eaff",
+          30
+        );
+
+        playSound("shield");
+
+      } else {
+
+        endGame();
+
+        return;
+
+      }
+
+    }
+
+  }
+
+
+  pipes =
+    pipes.filter(
+      pipe =>
+        pipe.x +
+        pipe.width >
+        -120
+    );
+
+
+  /* COINS */
+
+  const magnetRange =
+    42 +
+    save.upgrades.magnet * 38;
+
+
+  for (
+    const coin of coins
+  ) {
+
+    coin.x -=
+      speed * dt;
+
+    coin.spin +=
+      .12 * dt;
+
+    const dx =
+      bird.x -
+      coin.x;
+
+    const dy =
+      bird.y -
+      coin.y;
+
+    const distance =
+      Math.sqrt(
+        dx * dx +
+        dy * dy
+      );
+
+
+    if (
+      distance <
+      magnetRange
+    ) {
+
+      coin.x +=
+        dx * .065 * dt;
+
+      coin.y +=
+        dy * .065 * dt;
+
+    }
+
+
+    if (
+      !coin.collected &&
+      distance < 28
+    ) {
+
+      coin.collected = true;
+
+      const amount =
+        1 +
+        save.upgrades.coin;
+
+      runCoins += amount;
+
+      save.coins += amount;
+
+      save.totalCoins += amount;
+
+      save.missions.coins50 =
+        Math.min(
+          50,
+          save.missions.coins50 +
+          amount
+        );
+
+      createParticles(
+        coin.x,
+        coin.y,
+        "#ffd84d",
+        16
+      );
+
+      playSound("coin");
+
+      checkMissionRewards();
+
+    }
+
+  }
+
+
+  coins =
+    coins.filter(
+      coin =>
+        !coin.collected &&
+        coin.x > -60
+    );
+
+
+  /* BOUNDARIES */
+
+  if (
+    bird.y < 18 ||
+    bird.y > H - 38
+  ) {
+
+    if (shieldActive) {
+
+      shieldActive = false;
+
+      bird.vy = -7;
+
+      createParticles(
+        bird.x,
+        bird.y,
+        "#45eaff",
+        28
+      );
+
+      playSound("shield");
+
+    } else {
+
+      endGame();
+
+      return;
+
+    }
+
+  }
+
+
+  /* PARTICLES */
+
+  for (
+    const particle of particles
+  ) {
+
+    particle.x +=
+      particle.vx * dt;
+
+    particle.y +=
+      particle.vy * dt;
+
+    particle.vy +=
+      particle.gravity * dt;
+
+    particle.life -=
+      .035 * dt;
+
+  }
+
+
+  particles =
+    particles.filter(
+      particle =>
+        particle.life > 0
+    );
+
+
+  updateUI();
+
+}
+
+
+/* ============================================================
+   MISSION PROGRESS
+   ============================================================ */
+
+function updateMissionProgress() {
+
+  save.missions.games10 =
+    Math.min(
+      10,
+      save.gamesPlayed
+    );
+
+}
+
+
+/* ============================================================
+   MISSION REWARDS
+   ============================================================ */
+
+function checkMissionRewards() {
+
+  updateMissionProgress();
+
+  const missions = [
+
+    {
+      key: "score25",
+      max: 25,
+      reward: 150
+    },
+
+    {
+      key: "coins50",
+      max: 50,
+      reward: 250
+    },
+
+    {
+      key: "games10",
+      max: 10,
+      reward: 300
+    },
+
+    {
+      key: "score50",
+      max: 50,
+      reward: 500
+    }
+
+  ];
+
+
+  for (
+    const mission of missions
+  ) {
+
+    if (
+      save.missions[mission.key] >=
+      mission.max &&
+
+      !save.missionClaimed[mission.key]
+    ) {
+
+      save.coins +=
+        mission.reward;
+
+      save.missionClaimed[
+        mission.key
+      ] = true;
+
+      playSound("mission");
+
+    }
+
+  }
+
+  saveGame();
+
+}
+
+
+/* ============================================================
+   END GAME
+   ============================================================ */
+
+function endGame() {
+
+  if (
+    gameState !==
+    "playing"
+  ) {
+    return;
+  }
+
+  gameState = "gameover";
+
+  document.getElementById(
+    "pauseButton"
+  ).style.display = "none";
+
+  playSound("hit");
+
+  const skin =
+    SKINS[
+      save.skins.equipped
+    ];
+
+  createParticles(
+    bird.x,
+    bird.y,
+    skin.color,
+    40
+  );
+
+  const oldBest =
+    save.highScore;
+
+  const isNewBest =
+    score > oldBest;
+
+  if (isNewBest) {
+
+    save.highScore =
+      score;
+
+  }
+
+
+  save.missions.score25 =
+    Math.max(
+      save.missions.score25,
+      Math.min(score,25)
+    );
+
+  save.missions.score50 =
+    Math.max(
+      save.missions.score50,
+      Math.min(score,50)
+    );
+
+  checkMissionRewards();
+
+  saveGame();
+
+
+  document.getElementById(
+    "finalScore"
+  ).textContent =
+    score;
+
+  document.getElementById(
+    "finalCoins"
+  ).textContent =
+    runCoins;
+
+  document.getElementById(
+    "finalBest"
+  ).textContent =
+    save.highScore;
+
+  document.getElementById(
+    "newBest"
+  ).textContent =
+    isNewBest
+      ? "🏆 NEW HIGH SCORE!"
+      : "";
+
+  showPanel(
+    "gameOverPanel"
+  );
+
+  updateUI();
+
+}
+
+
+/* ============================================================
+   BACKGROUND
+   ============================================================ */
+
+function drawBackground() {
+
+  const phase =
+    Math.floor(score / 15) % 2;
+
+  const gradient =
+    ctx.createLinearGradient(
+      0,
+      0,
+      0,
+      H
+    );
+
+
+  if (phase === 0) {
+
+    gradient.addColorStop(
+      0,
+      "#071332"
+    );
+
+    gradient.addColorStop(
+      1,
+      "#14527a"
+    );
+
+  } else {
+
+    gradient.addColorStop(
+      0,
+      "#170b36"
+    );
+
+    gradient.addColorStop(
+      1,
+      "#571a69"
+    );
+
+  }
+
+
+  ctx.fillStyle =
+    gradient;
+
+  ctx.fillRect(
+    0,
+    0,
+    W,
+    H
+  );
+
+
+  for (
+    const star of stars
+  ) {
+
+    star.x -=
+      star.speed;
+
+    if (
+      star.x < 0
+    ) {
+      star.x = W;
+    }
+
+    ctx.globalAlpha =
+      star.alpha;
+
+    ctx.fillStyle =
+      "white";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      star.x,
+      star.y,
+      star.r,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+
+  }
+
+
+  for (
+    const cloud of clouds
+  ) {
+
+    cloud.x -=
+      cloud.speed;
+
+    if (
+      cloud.x +
+      cloud.width < 0
+    ) {
+
+      cloud.x =
+        W + cloud.width;
+
+    }
+
+    ctx.globalAlpha =
+      cloud.alpha;
+
+    ctx.fillStyle =
+      "#b9c9ff";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+      cloud.x,
+      cloud.y,
+      cloud.width,
+      28,
+      0,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+
+  }
+
+  ctx.globalAlpha = 1;
+
+
+  ctx.fillStyle =
+    "rgba(255,255,255,.09)";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    350,
+    130,
+    78,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+
+  ctx.fillStyle =
+    "rgba(255,255,255,.07)";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    340,
+    120,
+    55,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+}
+
+
+/* ============================================================
+   PIPE DRAW
+   ============================================================ */
+
+function drawPipes() {
+
+  for (
+    const pipe of pipes
+  ) {
+
+    const gradient =
+      ctx.createLinearGradient(
+        pipe.x,
+        0,
+        pipe.x + pipe.width,
+        0
+      );
+
+    gradient.addColorStop(
+      0,
+      "#08704d"
+    );
+
+    gradient.addColorStop(
+      .45,
+      "#42d88f"
+    );
+
+    gradient.addColorStop(
+      1,
+      "#0b8058"
+    );
+
+    ctx.fillStyle =
+      gradient;
+
+
+    ctx.fillRect(
+      pipe.x,
+      0,
+      pipe.width,
+      pipe.top
+    );
+
+    ctx.fillRect(
+      pipe.x,
+      pipe.bottom,
+      pipe.width,
+      H - pipe.bottom
+    );
+
+
+    ctx.fillStyle =
+      "rgba(255,255,255,.14)";
+
+    ctx.fillRect(
+      pipe.x + 8,
+      0,
+      8,
+      pipe.top
+    );
+
+    ctx.fillRect(
+      pipe.x + 8,
+      pipe.bottom,
+      8,
+      H - pipe.bottom
+    );
+
+
+    ctx.fillStyle =
+      "#5ae6a1";
+
+    ctx.fillRect(
+      pipe.x - 5,
+      pipe.top - 22,
+      pipe.width + 10,
+      22
+    );
+
+    ctx.fillRect(
+      pipe.x - 5,
+      pipe.bottom,
+      pipe.width + 10,
+      22
+    );
+
+
+    ctx.fillStyle =
+      "rgba(0,0,0,.13)";
+
+    ctx.fillRect(
+      pipe.x - 5,
+      pipe.top - 5,
+      pipe.width + 10,
+      5
+    );
+
+    ctx.fillRect(
+      pipe.x - 5,
+      pipe.bottom,
+      pipe.width + 10,
+      5
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   COIN DRAW
+   ============================================================ */
+
+function drawCoins() {
+
+  for (
+    const coin of coins
+  ) {
+
+    ctx.save();
+
+    ctx.translate(
+      coin.x,
+      coin.y
+    );
+
+    const scale =
+      Math.abs(
+        Math.cos(coin.spin)
+      ) * .38 + .62;
+
+    ctx.scale(
+      scale,
+      1
+    );
+
+    ctx.shadowColor =
+      "#ffd84d";
+
+    ctx.shadowBlur =
+      12;
+
+    ctx.fillStyle =
+      "#ffd84d";
+
+    ctx.strokeStyle =
+      "#fff3a3";
+
+    ctx.lineWidth = 3;
+
+    ctx.beginPath();
+
+    ctx.arc(
+      0,
+      0,
+      13,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle =
+      "#a46c00";
+
+    ctx.font =
+      "bold 13px Arial";
+
+    ctx.textAlign =
+      "center";
+
+    ctx.textBaseline =
+      "middle";
+
+    ctx.fillText(
+      "$",
+      0,
+      1
+    );
+
+    ctx.restore();
+
+  }
+
+}
+
+
+/* ============================================================
+   BIRD DRAW
+   ============================================================ */
+
+function drawBird() {
+
+  if (!bird) {
+    return;
+  }
+
+  const skin =
+    SKINS[
+      save.skins.equipped
+    ];
+
+  ctx.save();
+
+  ctx.translate(
+    bird.x,
+    bird.y
+  );
+
+  ctx.rotate(
+    bird.rotation
+  );
+
+
+  if (shieldActive) {
+
+    ctx.strokeStyle =
+      "rgba(67,231,255,.85)";
+
+    ctx.lineWidth = 4;
+
+    ctx.shadowColor =
+      "#42eaff";
+
+    ctx.shadowBlur =
+      18;
+
+    ctx.beginPath();
+
+    ctx.arc(
+      0,
+      0,
+      30,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.stroke();
+
+    ctx.shadowBlur = 0;
+
+  }
+
+
+  ctx.shadowColor =
+    skin.color;
+
+  ctx.shadowBlur =
+    18;
+
+  ctx.fillStyle =
+    skin.color;
+
+  ctx.beginPath();
+
+  ctx.arc(
+    0,
+    0,
+    19,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+  ctx.shadowBlur = 0;
+
+
+  ctx.fillStyle =
+    "rgba(0,0,0,.17)";
+
+  ctx.beginPath();
+
+  ctx.ellipse(
+    -8,
+    7,
+    11,
+    7,
+    -.3,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+
+  ctx.fillStyle =
+    "white";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    7,
+    -7,
+    6,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+
+  ctx.fillStyle =
+    "#101018";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    9,
+    -7,
+    3,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+
+  ctx.fillStyle =
+    "#ff9e42";
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    17,
+    -1
+  );
+
+  ctx.lineTo(
+    33,
+    5
+  );
+
+  ctx.lineTo(
+    17,
+    9
+  );
+
+  ctx.closePath();
+
+  ctx.fill();
+
+  ctx.restore();
+
+}
+
+
+/* ============================================================
+   PARTICLES
+   ============================================================ */
+
+function drawParticles() {
+
+  for (
+    const particle of particles
+  ) {
+
+    ctx.globalAlpha =
+      Math.max(
+        0,
+        particle.life
+      );
+
+    ctx.fillStyle =
+      particle.color;
+
+    ctx.beginPath();
+
+    ctx.arc(
+      particle.x,
+      particle.y,
+      particle.size *
+      particle.life,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+
+  }
+
+  ctx.globalAlpha = 1;
+
+}
+
+
+/* ============================================================
+   GROUND
+   ============================================================ */
+
+function drawGround() {
+
+  const ground =
+    ctx.createLinearGradient(
+      0,
+      H - 40,
+      0,
+      H
+    );
+
+  ground.addColorStop(
+    0,
+    "#193c59"
+  );
+
+  ground.addColorStop(
+    1,
+    "#060e1d"
+  );
+
+  ctx.fillStyle =
+    ground;
+
+  ctx.fillRect(
+    0,
+    H - 40,
+    W,
+    40
+  );
+
+  ctx.fillStyle =
+    "rgba(91,211,160,.4)";
+
+  ctx.fillRect(
+    0,
+    H - 40,
+    W,
+    5
+  );
+
+}
+
+
+/* ============================================================
+   DRAW
+   ============================================================ */
+
+function draw() {
+
+  drawBackground();
+
+  drawPipes();
+
+  drawCoins();
+
+  drawGround();
+
+  if (bird) {
+    drawBird();
+  }
+
+  drawParticles();
+
+
+  if (
+    gameState ===
+    "paused"
+  ) {
+
+    ctx.fillStyle =
+      "rgba(0,0,0,.28)";
+
+    ctx.fillRect(
+      0,
+      0,
+      W,
+      H
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   GAME LOOP
+   ============================================================ */
+
+function gameLoop(time) {
+
+  if (!lastTime) {
+    lastTime = time;
+  }
+
+  const dt =
+    Math.min(
+      (time - lastTime) / 16.67,
+      2
+    );
+
+  lastTime = time;
+
+  update(dt);
+
+  draw();
+
+  requestAnimationFrame(
+    gameLoop
+  );
+
+}
+
+
+requestAnimationFrame(
+  gameLoop
+);
+
+
+/* ============================================================
+   PANELS
+   ============================================================ */
+
+function hidePanels() {
+
+  document
+    .querySelectorAll(".panel")
+    .forEach(
+      panel =>
+        panel.classList.add(
+          "hidden"
+        )
+    );
+
+}
+
+
+function showPanel(id) {
+
+  hidePanels();
+
+  const panel =
+    document.getElementById(id);
+
+  if (panel) {
+
+    panel.classList.remove(
+      "hidden"
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   UI
+   ============================================================ */
+
+function updateUI() {
+
+  document.getElementById(
+    "coins"
+  ).textContent =
+    save.coins;
+
+  document.getElementById(
+    "highScore"
+  ).textContent =
+    save.highScore;
+
+  document.getElementById(
+    "menuCoins"
+  ).textContent =
+    save.coins;
+
+  document.getElementById(
+    "menuBest"
+  ).textContent =
+    save.highScore;
+
+  document.getElementById(
+    "shopCoins"
+  ).textContent =
+    save.coins;
+
+  document.getElementById(
+    "totalFlaps"
+  ).textContent =
+    save.totalFlaps;
+
+  document.getElementById(
+    "totalCoins"
+  ).textContent =
+    save.totalCoins;
+
+  document.getElementById(
+    "score"
+  ).textContent =
+    gameState === "playing"
+      ? score
+      : "0";
+
+}
+
+
+/* ============================================================
+   MENU BUTTONS
+   ============================================================ */
+
+document
+  .getElementById("playBtn")
+  .addEventListener(
+    "click",
+    startGame
+  );
+
+
+document
+  .getElementById("retryBtn")
+  .addEventListener(
+    "click",
+    startGame
+  );
+
+
+document
+  .getElementById("menuBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      gameState = "menu";
+
+      bird = null;
+
+      document.getElementById(
+        "pauseButton"
+      ).style.display = "none";
+
+      showPanel(
+        "menuPanel"
+      );
+
+      updateUI();
+
+    }
+  );
+
+
+/* ============================================================
+   SHOP
+   ============================================================ */
+
+document
+  .getElementById("shopBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      renderShop();
+
+      showPanel(
+        "shopPanel"
+      );
+
+    }
+  );
+
+
+document
+  .getElementById("gameOverShop")
+  .addEventListener(
+    "click",
+    () => {
+
+      renderShop();
+
+      showPanel(
+        "shopPanel"
+      );
+
+    }
+  );
+
+
+document
+  .getElementById("backShop")
+  .addEventListener(
+    "click",
+    () => {
+
+      showPanel(
+        gameState === "gameover"
+          ? "gameOverPanel"
+          : "menuPanel"
+      );
+
+    }
+  );
+
+
+function buyUpgrade(key) {
+
+  const info =
+    UPGRADES[key];
+
+  const level =
+    save.upgrades[key];
+
+  if (
+    level >= info.max
+  ) {
+    return;
+  }
+
+  const cost =
+    upgradeCost(key);
+
+  if (
+    save.coins < cost
+  ) {
+    return;
+  }
+
+  save.coins -= cost;
+
+  save.upgrades[key]++;
+
+  saveGame();
+
+  playSound("buy");
+
+  renderShop();
+
+  updateUI();
+
+}
+
+
+function buySkin(key) {
+
+  const skin =
+    SKINS[key];
+
+  const unlocked =
+    save.skins.unlocked.includes(
+      key
+    );
+
+
+  if (unlocked) {
+
+    save.skins.equipped =
+      key;
+
+    saveGame();
+
+    renderShop();
+
+    return;
+
+  }
+
+
+  if (
+    save.coins <
+    skin.price
+  ) {
+    return;
+  }
+
+
+  save.coins -=
+    skin.price;
+
+  save.skins.unlocked.push(
+    key
+  );
+
+  save.skins.equipped =
+    key;
+
+  saveGame();
+
+  playSound("buy");
+
+  renderShop();
+
+  updateUI();
+
+}
+
+
+function renderShop() {
+
+  const upgradeGrid =
+    document.getElementById(
+      "upgradeGrid"
+    );
+
+  const skinGrid =
+    document.getElementById(
+      "skinGrid"
+    );
+
+  upgradeGrid.innerHTML = "";
+
+  skinGrid.innerHTML = "";
+
+
+  Object.entries(
+    UPGRADES
+  ).forEach(
+    ([key, info]) => {
+
+      const level =
+        save.upgrades[key];
+
+      const maxed =
+        level >= info.max;
+
+      const cost =
+        upgradeCost(key);
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+      item.className =
+        "shopItem";
+
+      item.innerHTML = `
+
+        <div class="shopIcon">
+          ${info.icon}
+        </div>
+
+        <h3>
+          ${info.name}
+        </h3>
+
+        <p>
+          ${info.description}
+        </p>
+
+        <p>
+          LEVEL ${level}/${info.max}
+        </p>
+
+        <button
+          type="button"
+          ${maxed || save.coins < cost
+            ? "disabled"
+            : ""}
+        >
+          ${
+            maxed
+              ? "MAXED"
+              : "🪙 " + cost
+          }
+        </button>
+
+      `;
+
+
+      item
+        .querySelector("button")
+        .addEventListener(
+          "click",
+          () =>
+            buyUpgrade(key)
+        );
+
+
+      upgradeGrid.appendChild(
+        item
+      );
+
+    }
+  );
+
+
+  Object.entries(
+    SKINS
+  ).forEach(
+    ([key, skin]) => {
+
+      const unlocked =
+        save.skins.unlocked.includes(
+          key
+        );
+
+      const equipped =
+        save.skins.equipped === key;
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+      item.className =
+        "shopItem";
+
+      item.innerHTML = `
+
+        <div class="shopIcon">
+          ${skin.icon}
+        </div>
+
+        <h3>
+          ${skin.name}
+        </h3>
+
+        <p style="color:${skin.color}">
+          ● SPECIAL SKIN
+        </p>
+
+        <button
+          type="button"
+          ${
+            equipped ||
+            (
+              !unlocked &&
+              save.coins < skin.price
+            )
+              ? "disabled"
+              : ""
+          }
+        >
+          ${
+            equipped
+              ? "EQUIPPED"
+              : unlocked
+                ? "EQUIP"
+                : "🪙 " + skin.price
+          }
+        </button>
+
+      `;
+
+
+      item
+        .querySelector("button")
+        .addEventListener(
+          "click",
+          () =>
+            buySkin(key)
+        );
+
+
+      skinGrid.appendChild(
+        item
+      );
+
+    }
+  );
+
+
+  updateUI();
+
+}
+
+
+/* ============================================================
+   MISSIONS
+   ============================================================ */
+
+document
+  .getElementById("missionsBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      renderMissions();
+
+      showPanel(
+        "missionsPanel"
+      );
+
+    }
+  );
+
+
+document
+  .getElementById("backMissions")
+  .addEventListener(
+    "click",
+    () => {
+
+      showPanel(
+        "menuPanel"
+      );
+
+    }
+  );
+
+
+function renderMissions() {
+
+  const list =
+    document.getElementById(
+      "missionList"
+    );
+
+  list.innerHTML = "";
+
+  updateMissionProgress();
+
+  const missions = [
+
+    {
+      key: "score25",
+      name: "High Flyer",
+      description:
+        "Reach a score of 25.",
+      max: 25,
+      reward: 150
+    },
+
+    {
+      key: "coins50",
+      name: "Treasure Hunter",
+      description:
+        "Collect 50 coins.",
+      max: 50,
+      reward: 250
+    },
+
+    {
+      key: "games10",
+      name: "Persistent",
+      description:
+        "Play 10 games.",
+      max: 10,
+      reward: 300
+    },
+
+    {
+      key: "score50",
+      name: "Galaxy Master",
+      description:
+        "Reach a score of 50.",
+      max: 50,
+      reward: 500
+    }
+
+  ];
+
+
+  missions.forEach(
+    mission => {
+
+      const value =
+        Math.min(
+          save.missions[
+            mission.key
+          ],
+          mission.max
+        );
+
+      const complete =
+        value >= mission.max;
+
+      const claimed =
+        save.missionClaimed[
+          mission.key
+        ];
+
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+      item.className =
+        "mission";
+
+
+      item.innerHTML = `
+
+        <div class="missionTop">
+
+          <div class="missionName">
+            ${
+              complete
+                ? "✅"
+                : "🎯"
+            }
+            ${mission.name}
+          </div>
+
+          <div>
+            🪙 ${mission.reward}
+          </div>
+
+        </div>
+
+        <div class="missionDescription">
+          ${mission.description}
+        </div>
+
+        <div class="progress">
+
+          <div
+            style="
+              width:${
+                (value / mission.max) * 100
+              }%
+            "
+          ></div>
+
+        </div>
+
+        <div
+          style="
+            color:#7f8ba8;
+            font-size:10px;
+            margin-top:6px;
+          "
+        >
+          ${value}/${mission.max}
+
+          ${
+            claimed
+              ? " • REWARD CLAIMED"
+              : complete
+                ? " • REWARD ADDED"
+                : ""
+          }
+
+        </div>
+
+      `;
+
+
+      list.appendChild(
+        item
+      );
+
+    }
+  );
+
+
+  saveGame();
+
+}
+
+
+/* ============================================================
+   SOCIAL HUB
+   ============================================================ */
+
+document
+  .getElementById("creditsBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      updateUI();
+
+      showPanel(
+        "creditsPanel"
+      );
+
+    }
+  );
+
+
+document
+  .getElementById("backCredits")
+  .addEventListener(
+    "click",
+    () => {
+
+      showPanel(
+        "menuPanel"
+      );
+
+    }
+  );
+
+
+/* ============================================================
+   PAUSE
+   ============================================================ */
+
+document
+  .getElementById("pauseButton")
+  .addEventListener(
+    "click",
+    () => {
+
+      if (
+        gameState !== "playing"
+      ) {
+        return;
+      }
+
+      gameState = "paused";
+
+      showPanel(
+        "pausePanel"
+      );
+
+    }
+  );
+
+
+document
+  .getElementById("resumeBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      gameState = "playing";
+
+      lastTime =
+        performance.now();
+
+      hidePanels();
+
+    }
+  );
+
+
+document
+  .getElementById("pauseMenuBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      gameState = "menu";
+
+      bird = null;
+
+      document.getElementById(
+        "pauseButton"
+      ).style.display = "none";
+
+      showPanel(
+        "menuPanel"
+      );
+
+      updateUI();
+
+    }
+  );
+
+
+/* ============================================================
+   KEYBOARD
+   ============================================================ */
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    const flapKeys =
+      event.code === "Space" ||
+      event.code === "ArrowUp";
+
+
+    if (flapKeys) {
+
+      event.preventDefault();
+
+
+      if (
+        gameState === "playing"
+      ) {
+
+        flap();
+
+      } else if (
+        gameState === "menu"
+      ) {
+
+        startGame();
+
+      } else if (
+        gameState === "gameover"
+      ) {
+
+        startGame();
+
+      } else if (
+        gameState === "paused"
+      ) {
+
+        gameState = "playing";
+
+        lastTime =
+          performance.now();
+
+        hidePanels();
+
+      }
+
+    }
+
+
+    if (
+      event.code === "Escape"
+    ) {
+
+      if (
+        gameState === "playing"
+      ) {
+
+        gameState = "paused";
+
+        showPanel(
+          "pausePanel"
+        );
+
+      } else if (
+        gameState === "paused"
+      ) {
+
+        gameState = "playing";
+
+        lastTime =
+          performance.now();
+
+        hidePanels();
+
+      }
+
+    }
+
+  }
+);
+
+
+/* ============================================================
+   TOUCH / MOUSE
+   ============================================================ */
+
+canvas.addEventListener(
+  "pointerdown",
+  event => {
+
+    event.preventDefault();
+
+
+    if (
+      gameState === "playing"
+    ) {
+
+      flap();
+
+    } else if (
+      gameState === "menu"
+    ) {
+
+      startGame();
+
+    } else if (
+      gameState === "gameover"
+    ) {
+
+      startGame();
+
+    }
+
+  },
+  {
+    passive: false
+  }
+);
+
+
+/* ============================================================
+   INITIALIZE
+   ============================================================ */
+
+updateUI();
+
+showPanel(
+  "menuPanel"
+);
+
+</script>
+
+</body>
+</html>
