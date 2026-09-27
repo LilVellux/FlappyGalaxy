@@ -746,6 +746,191 @@ button:disabled {
 }
 
 /* ============================================================
+   CASE OPENING
+   ============================================================ */
+
+.caseOpeningOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(2,5,18,.84);
+  backdrop-filter: blur(12px);
+}
+
+.caseOpeningPanel {
+  width: min(620px, 100%);
+  padding: 22px 16px 18px;
+  border-radius: 24px;
+  text-align: center;
+  background: linear-gradient(145deg, rgba(17,27,61,.98), rgba(5,9,26,.99));
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 30px 100px rgba(0,0,0,.75), inset 0 1px rgba(255,255,255,.06);
+  animation: casePanelIn .25s ease;
+}
+
+@keyframes casePanelIn {
+  from { opacity: 0; transform: scale(.94) translateY(14px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.caseOpeningTitle {
+  font-size: 25px;
+  font-weight: 1000;
+  letter-spacing: 1px;
+}
+
+.caseOpeningSubtitle {
+  margin: 5px 0 17px;
+  color: #9ba7c2;
+  font-size: 12px;
+}
+
+.caseReelWindow {
+  position: relative;
+  height: 126px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: rgba(0,0,0,.35);
+  border: 1px solid rgba(255,255,255,.09);
+  box-shadow: inset 0 0 35px rgba(0,0,0,.5);
+}
+
+.caseCenterLine {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 3px;
+  transform: translateX(-50%);
+  background: #ffe36a;
+  box-shadow: 0 0 14px rgba(255,225,75,.9);
+  pointer-events: none;
+}
+
+.caseCenterLine::before,
+.caseCenterLine::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: translateX(-50%);
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+}
+
+.caseCenterLine::before {
+  top: 0;
+  border-top: 10px solid #ffe36a;
+}
+
+.caseCenterLine::after {
+  bottom: 0;
+  border-bottom: 10px solid #ffe36a;
+}
+
+.caseReel {
+  position: absolute;
+  left: 50%;
+  top: 9px;
+  height: 108px;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  transform: translateX(0);
+  will-change: transform;
+}
+
+.caseReelTile {
+  flex: 0 0 102px;
+  height: 108px;
+  padding: 9px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(255,255,255,.09), rgba(255,255,255,.035));
+  border: 1px solid rgba(255,255,255,.08);
+  box-sizing: border-box;
+}
+
+.caseReelTile .tileIcon {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.caseReelTile .tileName {
+  margin-top: 8px;
+  max-width: 95px;
+  color: #dbe3ff;
+  font-size: 9px;
+  font-weight: 1000;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.caseReelTile.goldTile {
+  background: linear-gradient(145deg, rgba(255,209,55,.26), rgba(255,140,20,.07));
+  border-color: rgba(255,218,72,.45);
+}
+
+.caseReelTile.rareTile {
+  background: linear-gradient(145deg, rgba(181,113,255,.23), rgba(80,50,160,.07));
+  border-color: rgba(207,145,255,.4);
+}
+
+.caseOpeningStatus {
+  min-height: 20px;
+  margin: 13px 0 3px;
+  color: #8f9bbb;
+  font-size: 11px;
+  font-weight: 1000;
+  letter-spacing: 1.2px;
+}
+
+.caseWinner {
+  margin: 4px auto 10px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,220,85,.35);
+  animation: winnerPop .42s cubic-bezier(.2,1.7,.3,1) both;
+}
+
+@keyframes winnerPop {
+  from { opacity: 0; transform: scale(.7); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.caseWinner .winnerIcon {
+  font-size: 38px;
+}
+
+.caseWinner .winnerText {
+  margin-top: 3px;
+  font-size: 17px;
+  font-weight: 1000;
+}
+
+.caseWinner .winnerSub {
+  margin-top: 3px;
+  color: #aeb9d4;
+  font-size: 10px;
+}
+
+@media (max-width: 520px) {
+  .caseOpeningPanel { padding: 18px 10px 13px; }
+  .caseReelTile { flex-basis: 88px; }
+  .caseReel { gap: 6px; }
+}
+
+/* ============================================================
    MISSIONS
    ============================================================ */
 
@@ -1202,6 +1387,37 @@ button:disabled {
         Made by LilVellux
       </div>
 
+    </div>
+
+    <!-- ======================================================
+         CASE OPENING OVERLAY
+         ====================================================== -->
+
+    <div
+      id="caseOpeningOverlay"
+      class="caseOpeningOverlay hidden"
+      aria-hidden="true"
+    >
+      <div class="caseOpeningPanel">
+        <div class="caseOpeningTitle" id="caseOpeningTitle">OPENING CASE</div>
+        <div class="caseOpeningSubtitle" id="caseOpeningSubtitle">Good luck, pilot...</div>
+
+        <div class="caseReelWindow">
+          <div class="caseCenterLine"></div>
+          <div id="caseReel" class="caseReel"></div>
+        </div>
+
+        <div id="caseOpeningStatus" class="caseOpeningStatus">ROLLING...</div>
+        <div id="caseWinner" class="caseWinner hidden"></div>
+
+        <button
+          id="caseContinueBtn"
+          class="gold hidden"
+          type="button"
+        >
+          ✨ COLLECT REWARD
+        </button>
+      </div>
     </div>
 
     <!-- ======================================================
@@ -2093,161 +2309,259 @@ const CASES = {
   starter: {
     name: "Star Case",
     icon: "📦",
-    description: "A small case with useful galaxy rewards.",
+    description: "Cheap case with coins, diamonds and a shot at rare skins.",
     cost: 5,
     rewards: [
-      { type: "coins", amount: 100, weight: 50 },
-      { type: "coins", amount: 250, weight: 30 },
-      { type: "gems", amount: 3, weight: 15 },
-      { type: "skin", key: "ruby", weight: 5 }
+      { type: "coins", amount: 100, weight: 43, label: "100 COINS", icon: "🪙", tier: "common" },
+      { type: "coins", amount: 250, weight: 28, label: "250 COINS", icon: "🪙", tier: "common" },
+      { type: "coins", amount: 750, weight: 10, label: "750 GOLD", icon: "🥇", tier: "gold" },
+      { type: "gems", amount: 3, weight: 14, label: "3 DIAMONDS", icon: "💎", tier: "rare" },
+      { type: "skin", key: "ruby", weight: 5, label: "RUBY SKIN", icon: "🔥", tier: "rare" }
     ]
   },
 
   cosmic: {
     name: "Cosmic Case",
     icon: "🌌",
-    description: "Better odds for rare rewards and skins.",
+    description: "Bigger gold prizes and better odds for rare rewards.",
     cost: 15,
     rewards: [
-      { type: "coins", amount: 400, weight: 40 },
-      { type: "coins", amount: 800, weight: 25 },
-      { type: "gems", amount: 10, weight: 20 },
-      { type: "skin", key: "ocean", weight: 8 },
-      { type: "skin", key: "toxic", weight: 7 }
+      { type: "coins", amount: 400, weight: 27, label: "400 COINS", icon: "🪙", tier: "common" },
+      { type: "coins", amount: 800, weight: 20, label: "800 COINS", icon: "🪙", tier: "common" },
+      { type: "coins", amount: 2500, weight: 16, label: "2,500 GOLD", icon: "🥇", tier: "gold" },
+      { type: "coins", amount: 5000, weight: 5, label: "5,000 GOLD JACKPOT", icon: "🏆", tier: "gold" },
+      { type: "gems", amount: 10, weight: 17, label: "10 DIAMONDS", icon: "💎", tier: "rare" },
+      { type: "skin", key: "ocean", weight: 8, label: "OCEAN SKIN", icon: "🌊", tier: "rare" },
+      { type: "skin", key: "toxic", weight: 7, label: "TOXIC SKIN", icon: "☢️", tier: "rare" }
     ]
   },
 
   legendary: {
     name: "Legendary Case",
     icon: "👑",
-    description: "Expensive, but packed with powerful rewards.",
+    description: "Chase huge Gold jackpots and the rarest galaxy skins.",
     cost: 35,
     rewards: [
-      { type: "coins", amount: 1000, weight: 30 },
-      { type: "coins", amount: 2000, weight: 25 },
-      { type: "gems", amount: 25, weight: 20 },
-      { type: "skin", key: "cosmic", weight: 12 },
-      { type: "skin", key: "golden", weight: 8 },
-      { type: "skin", key: "neon", weight: 5 }
+      { type: "coins", amount: 1000, weight: 22, label: "1,000 COINS", icon: "🪙", tier: "common" },
+      { type: "coins", amount: 2000, weight: 17, label: "2,000 COINS", icon: "🪙", tier: "common" },
+      { type: "coins", amount: 5000, weight: 18, label: "5,000 GOLD", icon: "🥇", tier: "gold" },
+      { type: "coins", amount: 10000, weight: 8, label: "10,000 GOLD JACKPOT", icon: "👑", tier: "gold" },
+      { type: "gems", amount: 25, weight: 15, label: "25 DIAMONDS", icon: "💎", tier: "rare" },
+      { type: "skin", key: "cosmic", weight: 8, label: "COSMIC SKIN", icon: "🌌", tier: "rare" },
+      { type: "skin", key: "golden", weight: 7, label: "GOLDEN SKIN", icon: "👑", tier: "gold" },
+      { type: "skin", key: "neon", weight: 5, label: "NEON SKIN", icon: "💠", tier: "rare" }
     ]
   }
 };
 
 
 function pickCaseReward(caseInfo) {
-  const totalWeight =
-    caseInfo.rewards.reduce(
-      (sum, reward) =>
-        sum + reward.weight,
-      0
-    );
+  const totalWeight = caseInfo.rewards.reduce(
+    (sum, reward) => sum + reward.weight,
+    0
+  );
 
-  let roll =
-    Math.random() *
-    totalWeight;
+  let roll = Math.random() * totalWeight;
 
-  for (
-    const reward of caseInfo.rewards
-  ) {
+  for (const reward of caseInfo.rewards) {
     roll -= reward.weight;
-
-    if (roll <= 0) {
-      return reward;
-    }
+    if (roll <= 0) return reward;
   }
 
-  return caseInfo.rewards[
-    caseInfo.rewards.length - 1
-  ];
+  return caseInfo.rewards[caseInfo.rewards.length - 1];
 }
 
 
-function openCase(key) {
-  const caseInfo =
-    CASES[key];
-
-  if (!caseInfo) {
-    return;
-  }
-
-  if (
-    save.gems <
-    caseInfo.cost
-  ) {
-    showToast(
-      "💎 Not enough diamonds!"
-    );
-    return;
-  }
-
-  save.gems -=
-    caseInfo.cost;
-
-  const reward =
-    pickCaseReward(caseInfo);
-
-  let message = "";
-
-  if (
-    reward.type === "coins"
-  ) {
-    save.coins +=
-      reward.amount;
-
-    message =
-      `📦 +${reward.amount} coins!`;
-  }
-
-  else if (
-    reward.type === "gems"
-  ) {
-    save.gems +=
-      reward.amount;
-
-    message =
-      `📦 +${reward.amount} diamonds!`;
-  }
-
-  else if (
+function caseRewardLabel(reward) {
+  return reward.label || (
     reward.type === "skin"
-  ) {
-    const alreadyOwned =
-      save.skins.unlocked.includes(
-        reward.key
-      );
+      ? `${SKINS[reward.key].name} SKIN`
+      : reward.type === "gems"
+        ? `${reward.amount} DIAMONDS`
+        : `${reward.amount} COINS`
+  );
+}
 
-    if (
-      alreadyOwned
-    ) {
-      const bonus =
-        500;
 
-      save.coins +=
-        bonus;
+function caseRewardIcon(reward) {
+  return reward.icon || (
+    reward.type === "skin"
+      ? SKINS[reward.key].icon
+      : reward.type === "gems"
+        ? "💎"
+        : "🪙"
+  );
+}
 
-      message =
-        `📦 Duplicate skin → +${bonus} coins!`;
-    }
 
-    else {
-      save.skins.unlocked.push(
-        reward.key
-      );
+function buildCaseReel(caseInfo, winner) {
+  const reel = document.getElementById("caseReel");
+  reel.innerHTML = "";
 
-      save.skins.equipped =
-        reward.key;
+  const tiles = [];
+  const winnerIndex = 36;
+  const totalTiles = 48;
 
-      message =
-        `📦 ${SKINS[reward.key].icon} ${SKINS[reward.key].name} unlocked!`;
+  for (let i = 0; i < totalTiles; i++) {
+    tiles.push(
+      i === winnerIndex
+        ? winner
+        : pickCaseReward(caseInfo)
+    );
+  }
+
+  tiles.forEach((reward) => {
+    const tile = document.createElement("div");
+    tile.className = `caseReelTile ${reward.tier === "gold" ? "goldTile" : ""} ${reward.tier === "rare" ? "rareTile" : ""}`;
+    tile.innerHTML = `
+      <div class="tileIcon">${caseRewardIcon(reward)}</div>
+      <div class="tileName">${caseRewardLabel(reward)}</div>
+    `;
+    reel.appendChild(tile);
+  });
+
+  return winnerIndex;
+}
+
+
+let activeCaseOpening = false;
+
+function finishCaseReward(reward, caseInfo) {
+  if (reward.type === "coins") {
+    save.coins += reward.amount;
+  }
+  else if (reward.type === "gems") {
+    save.gems += reward.amount;
+  }
+  else if (reward.type === "skin") {
+    const alreadyOwned = save.skins.unlocked.includes(reward.key);
+
+    if (alreadyOwned) {
+      save.coins += 500;
+      reward._duplicate = true;
+      reward._bonus = 500;
+    } else {
+      save.skins.unlocked.push(reward.key);
+      save.skins.equipped = reward.key;
     }
   }
 
   saveGame();
-  playSound("crate");
-  showToast(message);
   renderShop();
   updateUI();
 }
+
+
+function showCaseWinner(reward, caseInfo) {
+  const winner = document.getElementById("caseWinner");
+  const status = document.getElementById("caseOpeningStatus");
+  const button = document.getElementById("caseContinueBtn");
+
+  let title = caseRewardLabel(reward);
+  let sub = "REWARD ADDED TO YOUR ACCOUNT";
+
+  if (reward._duplicate) {
+    title = `${caseRewardIcon(reward)} DUPLICATE SKIN`;
+    sub = `Converted into +${reward._bonus} GOLD`;
+  } else if (reward.type === "coins" && reward.amount >= 2500) {
+    title = `✨ ${caseRewardLabel(reward)}`;
+    sub = "GOLD JACKPOT!";
+  } else if (reward.type === "skin") {
+    title = `${caseRewardIcon(reward)} ${SKINS[reward.key].name.toUpperCase()}`;
+    sub = "RARE SKIN UNLOCKED + EQUIPPED";
+  }
+
+  winner.innerHTML = `
+    <div class="winnerIcon">${caseRewardIcon(reward)}</div>
+    <div class="winnerText">${title}</div>
+    <div class="winnerSub">${sub}</div>
+  `;
+  winner.classList.remove("hidden");
+
+  status.textContent = reward.type === "coins" && reward.amount >= 2500
+    ? "🏆 JACKPOT!"
+    : "🎉 YOU WON!";
+
+  button.classList.remove("hidden");
+  playSound(reward.type === "coins" && reward.amount >= 2500 ? "achievement" : "crate");
+}
+
+
+function closeCaseOpening() {
+  const overlay = document.getElementById("caseOpeningOverlay");
+  overlay.classList.add("hidden");
+  overlay.setAttribute("aria-hidden", "true");
+  activeCaseOpening = false;
+}
+
+
+function openCase(key) {
+  if (activeCaseOpening) return;
+
+  const caseInfo = CASES[key];
+  if (!caseInfo) return;
+
+  if (save.gems < caseInfo.cost) {
+    showToast("💎 Not enough diamonds!");
+    return;
+  }
+
+  save.gems -= caseInfo.cost;
+  saveGame();
+  updateUI();
+
+  const reward = pickCaseReward(caseInfo);
+  activeCaseOpening = true;
+
+  const overlay = document.getElementById("caseOpeningOverlay");
+  const title = document.getElementById("caseOpeningTitle");
+  const subtitle = document.getElementById("caseOpeningSubtitle");
+  const status = document.getElementById("caseOpeningStatus");
+  const winner = document.getElementById("caseWinner");
+  const button = document.getElementById("caseContinueBtn");
+  const reel = document.getElementById("caseReel");
+
+  title.textContent = `${caseInfo.icon} ${caseInfo.name.toUpperCase()}`;
+  subtitle.textContent = "The reel is spinning... what will you get?";
+  status.textContent = "ROLLING...";
+  winner.classList.add("hidden");
+  button.classList.add("hidden");
+  overlay.classList.remove("hidden");
+  overlay.setAttribute("aria-hidden", "false");
+
+  const winnerIndex = buildCaseReel(caseInfo, reward);
+  const tileWidth = window.innerWidth <= 520 ? 88 : 102;
+  const gap = window.innerWidth <= 520 ? 6 : 8;
+  const centerOffset = (tileWidth + gap) * winnerIndex + tileWidth / 2;
+  const target = -(centerOffset);
+  const jitter = random(-tileWidth * 0.32, tileWidth * 0.32);
+
+  reel.style.transition = "none";
+  reel.style.transform = "translateX(0px)";
+
+  // Force layout so the browser applies the reset before the long slowdown animation.
+  void reel.offsetWidth;
+
+  const finalX = target + jitter;
+  reel.style.transition = "transform 3.15s cubic-bezier(.08,.76,.12,1)";
+  reel.style.transform = `translateX(${finalX}px)`;
+
+  playSound("crate");
+
+  const tickTimes = [500, 900, 1250, 1550, 1800, 2020, 2210, 2380, 2520, 2630, 2730, 2820];
+  tickTimes.forEach((delay) => {
+    setTimeout(() => {
+      if (activeCaseOpening) playSound("gem");
+    }, delay);
+  });
+
+  setTimeout(() => {
+    if (!activeCaseOpening) return;
+    finishCaseReward(reward, caseInfo);
+    showCaseWinner(reward, caseInfo);
+  }, 3300);
+}
+
 
 
 /* ============================================================
@@ -3080,17 +3394,18 @@ function dash() {
 
 function createPipe() {
 
+  // Keep a generous opening so players have more time to react.
   const gap =
     isEasyMode()
       ? Math.max(
-          195 -
-          score * .45,
-          150
+          215 -
+          score * .30,
+          180
         )
       : Math.max(
-          166 -
-          score * .72,
-          105
+          190 -
+          score * .40,
+          145
         );
 
   const margin =
@@ -4299,10 +4614,11 @@ function update(
      Pipes.
   */
 
+  // Space pipes farther apart so the player gets more reaction time.
   const pipeInterval =
     isEasyMode()
-      ? 120
-      : 102;
+      ? 145
+      : 125;
 
   if (
     frame % pipeInterval === 0
