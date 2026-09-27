@@ -1250,6 +1250,15 @@ button:disabled {
           class="shopGrid"
         ></div>
 
+        <div class="shopTitle">
+          💎 CASES
+        </div>
+
+        <div
+          id="caseGrid"
+          class="shopGrid"
+        ></div>
+
       </div>
 
       <button
@@ -2076,6 +2085,175 @@ const SKINS = {
    UPGRADES
    ============================================================ */
 
+/* ============================================================
+   CASES
+   ============================================================ */
+
+const CASES = {
+  starter: {
+    name: "Star Case",
+    icon: "📦",
+    description: "A small case with useful galaxy rewards.",
+    cost: 5,
+    rewards: [
+      { type: "coins", amount: 100, weight: 50 },
+      { type: "coins", amount: 250, weight: 30 },
+      { type: "gems", amount: 3, weight: 15 },
+      { type: "skin", key: "ruby", weight: 5 }
+    ]
+  },
+
+  cosmic: {
+    name: "Cosmic Case",
+    icon: "🌌",
+    description: "Better odds for rare rewards and skins.",
+    cost: 15,
+    rewards: [
+      { type: "coins", amount: 400, weight: 40 },
+      { type: "coins", amount: 800, weight: 25 },
+      { type: "gems", amount: 10, weight: 20 },
+      { type: "skin", key: "ocean", weight: 8 },
+      { type: "skin", key: "toxic", weight: 7 }
+    ]
+  },
+
+  legendary: {
+    name: "Legendary Case",
+    icon: "👑",
+    description: "Expensive, but packed with powerful rewards.",
+    cost: 35,
+    rewards: [
+      { type: "coins", amount: 1000, weight: 30 },
+      { type: "coins", amount: 2000, weight: 25 },
+      { type: "gems", amount: 25, weight: 20 },
+      { type: "skin", key: "cosmic", weight: 12 },
+      { type: "skin", key: "golden", weight: 8 },
+      { type: "skin", key: "neon", weight: 5 }
+    ]
+  }
+};
+
+
+function pickCaseReward(caseInfo) {
+  const totalWeight =
+    caseInfo.rewards.reduce(
+      (sum, reward) =>
+        sum + reward.weight,
+      0
+    );
+
+  let roll =
+    Math.random() *
+    totalWeight;
+
+  for (
+    const reward of caseInfo.rewards
+  ) {
+    roll -= reward.weight;
+
+    if (roll <= 0) {
+      return reward;
+    }
+  }
+
+  return caseInfo.rewards[
+    caseInfo.rewards.length - 1
+  ];
+}
+
+
+function openCase(key) {
+  const caseInfo =
+    CASES[key];
+
+  if (!caseInfo) {
+    return;
+  }
+
+  if (
+    save.gems <
+    caseInfo.cost
+  ) {
+    showToast(
+      "💎 Not enough diamonds!"
+    );
+    return;
+  }
+
+  save.gems -=
+    caseInfo.cost;
+
+  const reward =
+    pickCaseReward(caseInfo);
+
+  let message = "";
+
+  if (
+    reward.type === "coins"
+  ) {
+    save.coins +=
+      reward.amount;
+
+    message =
+      `📦 +${reward.amount} coins!`;
+  }
+
+  else if (
+    reward.type === "gems"
+  ) {
+    save.gems +=
+      reward.amount;
+
+    message =
+      `📦 +${reward.amount} diamonds!`;
+  }
+
+  else if (
+    reward.type === "skin"
+  ) {
+    const alreadyOwned =
+      save.skins.unlocked.includes(
+        reward.key
+      );
+
+    if (
+      alreadyOwned
+    ) {
+      const bonus =
+        500;
+
+      save.coins +=
+        bonus;
+
+      message =
+        `📦 Duplicate skin → +${bonus} coins!`;
+    }
+
+    else {
+      save.skins.unlocked.push(
+        reward.key
+      );
+
+      save.skins.equipped =
+        reward.key;
+
+      message =
+        `📦 ${SKINS[reward.key].icon} ${SKINS[reward.key].name} unlocked!`;
+    }
+  }
+
+  saveGame();
+  playSound("crate");
+  showToast(message);
+  renderShop();
+  updateUI();
+}
+
+
+/* ============================================================
+   UPGRADES
+   ============================================================ */
+
 const UPGRADES = {
 
   jump: {
@@ -2355,6 +2533,10 @@ let coinDoubleTimer = 0;
 
 let reviveCharges = 0;
 let hasRevived = false;
+
+// Checkpoint revive system: a new free revive is earned every 10 score.
+let checkpointScore = 0;
+let checkpointReviveAvailable = false;
 
 let boss = null;
 
@@ -2739,6 +2921,9 @@ function startGame() {
 
   hasRevived = false;
 
+  checkpointScore = 0;
+  checkpointReviveAvailable = false;
+
   reviveCharges =
     save.upgrades.revive;
 
@@ -3072,10 +3257,10 @@ function spawnMeteor() {
       random(80, H - 90),
 
     radius:
-      random(13, 25),
+      random(10, 18),
 
     vx:
-      random(4, 7),
+      random(2.4, 4.2),
 
     rotation:
       Math.random() * 6,
@@ -3244,6 +3429,20 @@ function addScorePoint() {
   score++;
 
   save.totalScore++;
+
+  // Every 10 points becomes a checkpoint and grants one free revive.
+  if (
+    score >= 10 &&
+    score % 10 === 0
+  ) {
+
+    checkpointScore = score;
+    checkpointReviveAvailable = true;
+
+    showToast(`🚩 CHECKPOINT ${score}!`);
+    playSound("achievement");
+
+  }
 
   comboTimer = 180;
 
@@ -3799,62 +3998,6 @@ function endGame() {
 
   }
 
-  /*
-     Revive is handled as an actual gameplay mechanic.
-  */
-
-  if (
-    reviveCharges > 0 &&
-    !hasRevived
-  ) {
-
-    hasRevived = true;
-
-    reviveCharges--;
-
-    gameState =
-      "playing";
-
-    shieldActive = true;
-
-    bird.y =
-      H / 2;
-
-    bird.vy =
-      -8;
-
-    dashActive = true;
-
-    dashTimer =
-      50;
-
-    screenShake =
-      18;
-
-    createShockwave(
-      bird.x,
-      bird.y,
-      "#ff66d9"
-    );
-
-    createParticles(
-      bird.x,
-      bird.y,
-      "#ff66d9",
-      70,
-      2
-    );
-
-    playSound("revive");
-
-    showToast(
-      "❤️ REVIVED!"
-    );
-
-    return;
-
-  }
-
   gameState =
     "gameover";
 
@@ -3961,13 +4104,24 @@ function endGame() {
       "reviveBtn"
     );
 
+  const canCheckpointRevive =
+    checkpointReviveAvailable &&
+    checkpointScore > 0;
+
+  const canUpgradeRevive =
+    reviveCharges > 0 &&
+    !hasRevived;
+
   reviveButton.disabled =
-    true;
+    !canCheckpointRevive &&
+    !canUpgradeRevive;
 
   reviveButton.textContent =
-    hasRevived
-      ? "❤️ USED"
-      : "❤️ REVIVE";
+    canCheckpointRevive
+      ? `🚩 REVIVE FROM ${checkpointScore}`
+      : canUpgradeRevive
+        ? "❤️ REVIVE"
+        : "❤️ NO REVIVE";
 
   showPanel(
     "gameOverPanel"
@@ -4445,8 +4599,8 @@ function update(
     frame %
       (
         isEasyMode()
-          ? 420
-          : 300
+          ? 520
+          : 400
       ) === 0 &&
     score >= (
       isEasyMode()
@@ -4517,10 +4671,13 @@ function update(
       circleCollision(
         bird.x,
         bird.y,
-        isEasyMode() ? 14 : 17,
+        isEasyMode() ? 12 : 14,
         meteor.x,
         meteor.y,
-        meteor.radius
+        Math.max(
+          8,
+          meteor.radius - 2
+        )
       )
     ) {
 
@@ -6599,6 +6756,16 @@ function updateUI() {
   const active = [];
 
   if (
+    checkpointScore > 0
+  ) {
+
+    active.push(
+      `🚩 CP ${checkpointScore}`
+    );
+
+  }
+
+  if (
     shieldActive
   ) {
 
@@ -6668,8 +6835,114 @@ function updateUI() {
 
 
 /* ============================================================
+   REVIVE
+   ============================================================ */
+
+function revivePlayer() {
+
+  const useCheckpoint =
+    checkpointReviveAvailable &&
+    checkpointScore > 0;
+
+  const useUpgrade =
+    !useCheckpoint &&
+    reviveCharges > 0 &&
+    !hasRevived;
+
+  if (
+    !useCheckpoint &&
+    !useUpgrade
+  ) {
+
+    return;
+
+  }
+
+  if (useCheckpoint) {
+
+    score = checkpointScore;
+    checkpointReviveAvailable = false;
+
+    // Restart hazards around the checkpoint so the player gets a clean chance.
+    pipes = [];
+    coins = [];
+    gems = [];
+    powerups = [];
+    meteors = [];
+    ufos = [];
+    particles = [];
+    shockwaves = [];
+
+    frame = 0;
+
+    multiplier = 1;
+    comboTimer = 0;
+
+    boss = null;
+
+    showToast(
+      `🚩 CHECKPOINT ${checkpointScore}!`
+    );
+
+  } else {
+
+    hasRevived = true;
+    reviveCharges--;
+
+  }
+
+  gameState = "playing";
+
+  shieldActive = true;
+
+  bird.y = H / 2;
+  bird.vy = -8;
+  bird.rotation = 0;
+
+  dashActive = true;
+  dashTimer = 50;
+
+  screenShake = 18;
+
+  createShockwave(
+    bird.x,
+    bird.y,
+    "#ff66d9"
+  );
+
+  createParticles(
+    bird.x,
+    bird.y,
+    "#ff66d9",
+    70,
+    2
+  );
+
+  playSound("revive");
+
+  showToast(
+    useCheckpoint
+      ? `🚩 BACK TO ${checkpointScore}!`
+      : "❤️ REVIVED!"
+  );
+
+  document.getElementById(
+    "pauseButton"
+  ).style.display = "block";
+
+  hidePanels();
+
+  lastTime = performance.now();
+
+  updateUI();
+
+}
+
+
+/* ============================================================
    MENU
    ============================================================ */
+
 
 document
   .getElementById("playBtn")
@@ -6684,6 +6957,14 @@ document
   .addEventListener(
     "click",
     startGame
+  );
+
+
+document
+  .getElementById("reviveBtn")
+  .addEventListener(
+    "click",
+    revivePlayer
   );
 
 
@@ -7059,6 +7340,75 @@ function renderShop() {
 
     }
   );
+
+  const caseGrid =
+    document.getElementById(
+      "caseGrid"
+    );
+
+  caseGrid.innerHTML =
+    "";
+
+  Object.entries(
+    CASES
+  ).forEach(
+    ([key, caseInfo]) => {
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+      item.className =
+        "shopItem";
+
+      item.innerHTML = `
+        <div class="shopIcon">
+          ${caseInfo.icon}
+        </div>
+
+        <h3>
+          ${caseInfo.name}
+        </h3>
+
+        <p>
+          ${caseInfo.description}
+        </p>
+
+        <p>
+          💎 ${caseInfo.cost} diamonds
+        </p>
+
+        <button
+          type="button"
+          ${
+            save.gems <
+            caseInfo.cost
+              ? "disabled"
+              : ""
+          }
+        >
+          📦 OPEN
+        </button>
+      `;
+
+      item
+        .querySelector(
+          "button"
+        )
+        .addEventListener(
+          "click",
+          () =>
+            openCase(key)
+        );
+
+      caseGrid.appendChild(
+        item
+      );
+
+    }
+  );
+
 
   updateUI();
 
