@@ -2,29 +2,58 @@
 <html lang="en">
 <head>
 
-<link rel="manifest" href="/manifest.json">
-
 <meta charset="UTF-8">
 
 <meta
   name="viewport"
-  content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
+  content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, maximum-scale=1"
 >
 
-<meta name="theme-color" content="#050814">
+<meta
+  name="theme-color"
+  content="#030611"
+>
+
+<meta
+  name="mobile-web-app-capable"
+  content="yes"
+>
+
+<meta
+  name="apple-mobile-web-app-capable"
+  content="yes"
+>
+
+<meta
+  name="apple-mobile-web-app-status-bar-style"
+  content="black-translucent"
+>
+
+<meta
+  name="apple-mobile-web-app-title"
+  content="Flappy Galaxy"
+>
 
 <meta
   name="description"
-  content="Flappy Galaxy — LilVellux Edition"
+  content="Flappy Galaxy 2.0 — LilVellux Edition"
 >
 
-<title>Flappy Galaxy — LilVellux</title>
+<title>Flappy Galaxy 2.0 — LilVellux</title>
 
 <style>
 
 /* ============================================================
-   GLOBAL RESET
+   FLAPPY GALAXY 2.0
+   MOBILE-FIRST / IPHONE / ANDROID
    ============================================================ */
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
 
 * {
   box-sizing: border-box;
@@ -32,46 +61,34 @@
   -webkit-touch-callout: none;
 }
 
-html,
+html {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  background: #02040c;
+  overscroll-behavior: none;
+}
+
 body {
   margin: 0;
   width: 100%;
   height: 100%;
-  min-height: 100%;
-}
-
-html {
-  background: #050814;
-}
-
-body {
-  width: 100%;
   min-height: 100dvh;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
 
   overflow: hidden;
 
-  padding:
-    max(8px, env(safe-area-inset-top))
-    max(8px, env(safe-area-inset-right))
-    max(8px, env(safe-area-inset-bottom))
-    max(8px, env(safe-area-inset-left));
-
   background:
     radial-gradient(
-      circle at 20% 15%,
-      #263e86 0%,
-      transparent 30%
+      circle at 15% 15%,
+      rgba(65, 92, 210, .30),
+      transparent 32%
     ),
     radial-gradient(
-      circle at 80% 85%,
-      #652276 0%,
-      transparent 30%
+      circle at 85% 85%,
+      rgba(185, 38, 170, .22),
+      transparent 32%
     ),
-    #050814;
+    #02040c;
 
   color: #fff;
 
@@ -81,52 +98,131 @@ body {
     sans-serif;
 
   overscroll-behavior: none;
-  touch-action: manipulation;
+  touch-action: none;
+
+  padding:
+    var(--safe-top)
+    var(--safe-right)
+    var(--safe-bottom)
+    var(--safe-left);
+
+  -webkit-user-select: none;
+  user-select: none;
 }
 
-
 /* ============================================================
-   GAME CONTAINER
+   GAME WRAPPER
    ============================================================ */
 
 #gameWrap {
-  position: relative;
+  position: fixed;
+
+  left: 50%;
+  top: 50%;
+
+  transform: translate(-50%, -50%);
 
   width: min(
     430px,
-    calc(100vw - 16px),
-    calc((100dvh - 16px) * 430 / 720)
+    calc(100vw - var(--safe-left) - var(--safe-right))
+  );
+
+  height: min(
+    720px,
+    calc(100dvh - var(--safe-top) - var(--safe-bottom))
   );
 
   aspect-ratio: 430 / 720;
 
-  max-width: 430px;
+  overflow: hidden;
 
-  max-height:
-    calc(100dvh - 16px);
+  border-radius:
+    clamp(0px, 5vw, 26px);
 
-  flex: 0 0 auto;
+  background: #050916;
+
+  box-shadow:
+    0 30px 100px rgba(0,0,0,.75),
+    0 0 60px rgba(75,100,255,.16);
 }
 
+/*
+   Keep the original 430x720 aspect ratio.
+   If the phone is wider, height determines the size.
+   If the phone is taller/narrower, width determines the size.
+*/
+
+@media (min-aspect-ratio: 430/720) {
+  #gameWrap {
+    height:
+      min(
+        720px,
+        calc(100dvh - var(--safe-top) - var(--safe-bottom))
+      );
+
+    width:
+      calc(
+        min(
+          720px,
+          calc(100dvh - var(--safe-top) - var(--safe-bottom))
+        ) * 430 / 720
+      );
+  }
+}
+
+@media (max-aspect-ratio: 430/720) {
+  #gameWrap {
+    width:
+      calc(
+        100vw -
+        var(--safe-left) -
+        var(--safe-right)
+      );
+
+    height:
+      calc(
+        (
+          100vw -
+          var(--safe-left) -
+          var(--safe-right)
+        ) * 720 / 430
+      );
+  }
+}
+
+/* ============================================================
+   TRUE STANDALONE PHONE MODE
+   ============================================================ */
+
+@media (display-mode: standalone) {
+
+  #gameWrap {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+}
+
+@media (display-mode: fullscreen) {
+
+  #gameWrap {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+}
 
 /* ============================================================
    CANVAS
    ============================================================ */
 
 canvas {
+  display: block;
+
   width: 100%;
   height: 100%;
 
-  display: block;
-
-  background: #091331;
-
-  border-radius:
-    clamp(14px, 5vw, 26px);
-
-  box-shadow:
-    0 30px 90px rgba(0,0,0,.7),
-    0 0 50px rgba(93,125,255,.18);
+  background: #06102b;
 
   touch-action: none;
 
@@ -134,9 +230,8 @@ canvas {
   user-select: none;
 }
 
-
 /* ============================================================
-   UI LAYER
+   UI
    ============================================================ */
 
 #ui {
@@ -145,7 +240,6 @@ canvas {
 
   pointer-events: none;
 }
-
 
 /* ============================================================
    TOP BAR
@@ -159,38 +253,41 @@ canvas {
   right: 3%;
 
   display: flex;
-
   justify-content: space-between;
+  align-items: flex-start;
 
-  gap: 8px;
+  gap: 6px;
 
   z-index: 20;
 }
 
-.badge {
-  padding:
-    clamp(7px, 2.5%, 9px)
-    clamp(10px, 3%, 13px);
-
-  border-radius: 15px;
-
-  background:
-    rgba(5,10,30,.72);
-
-  border:
-    1px solid rgba(255,255,255,.14);
-
-  backdrop-filter:
-    blur(12px);
-
-  font-weight: 800;
-
-  box-shadow:
-    0 6px 25px rgba(0,0,0,.2);
-
-  white-space: nowrap;
+.topGroup {
+  display: flex;
+  gap: 6px;
 }
 
+.badge {
+  padding:
+    7px 10px;
+
+  border-radius: 13px;
+
+  background:
+    rgba(4,8,25,.72);
+
+  border:
+    1px solid rgba(255,255,255,.12);
+
+  backdrop-filter: blur(12px);
+
+  font-weight: 900;
+  font-size: 12px;
+
+  white-space: nowrap;
+
+  box-shadow:
+    0 6px 20px rgba(0,0,0,.2);
+}
 
 /* ============================================================
    SCORE
@@ -199,7 +296,7 @@ canvas {
 #score {
   position: absolute;
 
-  top: 9%;
+  top: 10%;
 
   left: 0;
 
@@ -208,23 +305,75 @@ canvas {
   text-align: center;
 
   font-size:
-    clamp(38px, 13.5%, 58px);
+    clamp(38px, 13%, 58px);
 
   line-height: 1;
 
   font-weight: 1000;
 
   text-shadow:
-    0 6px 18px rgba(0,0,0,.55);
+    0 5px 18px rgba(0,0,0,.65);
 
   z-index: 10;
-
-  pointer-events: none;
 }
 
+#multiplier {
+  position: absolute;
+
+  top: 17%;
+
+  width: 100%;
+
+  text-align: center;
+
+  font-size: 15px;
+
+  font-weight: 1000;
+
+  color: #ffd84d;
+
+  text-shadow:
+    0 3px 10px rgba(0,0,0,.7);
+
+  opacity: 0;
+
+  transition: opacity .15s;
+}
+
+#powerStatus {
+  position: absolute;
+
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  bottom: 8%;
+
+  display: flex;
+
+  gap: 5px;
+
+  z-index: 25;
+}
+
+.powerBadge {
+  padding: 5px 8px;
+
+  border-radius: 999px;
+
+  background: rgba(0,0,0,.5);
+
+  border: 1px solid rgba(255,255,255,.15);
+
+  font-size: 10px;
+
+  font-weight: 900;
+
+  white-space: nowrap;
+}
 
 /* ============================================================
-   PAUSE BUTTON
+   PAUSE
    ============================================================ */
 
 #pauseButton {
@@ -233,52 +382,43 @@ canvas {
   right: 3%;
   top: 8%;
 
-  width: auto;
-
-  min-width: 44px;
-
+  width: 44px;
   height: 44px;
 
-  padding: 8px 12px;
-
-  margin: 0;
+  min-height: 44px;
 
   display: none;
 
   z-index: 30;
+
+  pointer-events: auto;
 }
 
-
 /* ============================================================
-   SCREEN / PANELS
+   SCREENS
    ============================================================ */
 
 #screen {
   position: absolute;
-
   inset: 0;
 
   padding:
-    clamp(12px, 5%, 22px);
+    clamp(10px, 4%, 22px);
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
-  pointer-events: none;
-
   z-index: 15;
+
+  pointer-events: none;
 
   overflow: hidden;
 }
 
 .panel {
   width: 100%;
-
   max-width: 100%;
-
   max-height: 94%;
 
   overflow: hidden;
@@ -294,27 +434,40 @@ canvas {
   background:
     linear-gradient(
       145deg,
-      rgba(13,21,51,.97),
-      rgba(8,12,29,.95)
+      rgba(12,20,48,.97),
+      rgba(5,9,24,.97)
     );
 
   border:
     1px solid rgba(255,255,255,.13);
 
   box-shadow:
-    0 30px 80px rgba(0,0,0,.55),
+    0 30px 80px rgba(0,0,0,.62),
     inset 0 1px rgba(255,255,255,.04);
 
-  backdrop-filter:
-    blur(20px);
+  backdrop-filter: blur(20px);
 
   pointer-events: auto;
+
+  animation:
+    panelIn .22s ease;
+}
+
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: scale(.96) translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .hidden {
   display: none !important;
 }
-
 
 /* ============================================================
    LOGO
@@ -322,9 +475,9 @@ canvas {
 
 .logo {
   font-size:
-    clamp(32px, 10%, 42px);
+    clamp(31px, 10%, 42px);
 
-  line-height: .92;
+  line-height: .9;
 
   font-weight: 1000;
 
@@ -333,9 +486,9 @@ canvas {
   background:
     linear-gradient(
       90deg,
-      #62eaff,
-      #8d7cff,
-      #ff71d5
+      #55efff,
+      #8c79ff,
+      #ff65d5
     );
 
   -webkit-background-clip: text;
@@ -343,20 +496,19 @@ canvas {
 
   color: transparent;
 
-  margin-bottom: 9px;
+  margin-bottom: 8px;
 }
 
 .subtitle {
-  color: #9da9c8;
+  color: #9ca8c5;
 
   font-size:
-    clamp(12px, 3.5%, 14px);
+    clamp(11px, 3.5%, 14px);
 
-  line-height: 1.45;
+  line-height: 1.4;
 
-  margin-bottom: 18px;
+  margin-bottom: 15px;
 }
-
 
 /* ============================================================
    BUTTONS
@@ -368,16 +520,13 @@ button {
     Helvetica,
     sans-serif;
 
-  -webkit-user-select: none;
-  user-select: none;
-
   width: 100%;
 
   min-height: 48px;
 
   margin: 5px 0;
 
-  padding: 12px 14px;
+  padding: 11px 13px;
 
   border: 0;
 
@@ -388,67 +537,71 @@ button {
   background:
     linear-gradient(
       135deg,
-      #667cff,
-      #995bff
+      #627aff,
+      #a05cff
     );
 
-  font-size: 15px;
+  font-size: 14px;
 
-  font-weight: 900;
+  font-weight: 1000;
 
   cursor: pointer;
+
+  pointer-events: auto;
 
   touch-action: manipulation;
 
   transition:
-    transform .12s ease,
-    filter .12s ease,
-    opacity .12s ease,
-    box-shadow .12s ease;
-}
-
-button:hover {
-  transform:
-    translateY(-2px);
-
-  filter:
-    brightness(1.1);
+    transform .1s ease,
+    filter .1s ease,
+    opacity .1s ease;
 }
 
 button:active {
-  transform:
-    scale(.98);
+  transform: scale(.97);
 }
 
-button:disabled {
-  opacity: .4;
-
-  cursor:
-    not-allowed;
-
-  transform:
-    none;
-
-  filter:
-    none;
+button:hover {
+  filter: brightness(1.1);
 }
 
 button.secondary {
-  background:
-    #202a46;
+  background: #202a47;
 }
 
 button.gold {
-  color: #241700;
+  color: #291b00;
 
   background:
     linear-gradient(
       135deg,
-      #f4a62a,
-      #ffdb65
+      #f3a82e,
+      #ffe06a
     );
 }
 
+button.red {
+  background:
+    linear-gradient(
+      135deg,
+      #ff4d6d,
+      #d9295b
+    );
+}
+
+button.green {
+  background:
+    linear-gradient(
+      135deg,
+      #28d994,
+      #0fae78
+    );
+}
+
+button:disabled {
+  opacity: .38;
+  transform: none;
+}
 
 /* ============================================================
    STATS
@@ -460,15 +613,15 @@ button.gold {
   grid-template-columns:
     1fr 1fr;
 
-  gap: 9px;
+  gap: 8px;
 
-  margin: 15px 0;
+  margin: 13px 0;
 }
 
 .stat {
-  padding: 12px;
+  padding: 11px;
 
-  border-radius: 15px;
+  border-radius: 14px;
 
   background:
     rgba(255,255,255,.055);
@@ -482,24 +635,23 @@ button.gold {
 
   margin-bottom: 4px;
 
-  color: #8f9bb9;
+  color: #8d9ab9;
 
-  font-size: 10px;
+  font-size: 9px;
 
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .stat strong {
-  font-size: 21px;
+  font-size: 20px;
 }
 
-
 /* ============================================================
-   SCROLL AREAS
+   SCROLL
    ============================================================ */
 
 .scrollArea {
-  max-height: 340px;
+  max-height: 330px;
 
   overflow-y: auto;
 
@@ -507,31 +659,36 @@ button.gold {
 
   scrollbar-width: thin;
 
-  scrollbar-color:
-    #5568a8
-    transparent;
-
   -webkit-overflow-scrolling: touch;
+
+  touch-action: pan-y;
 }
 
+.scrollArea::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollArea::-webkit-scrollbar-thumb {
+  background: #5267a6;
+  border-radius: 999px;
+}
 
 /* ============================================================
    SHOP
    ============================================================ */
 
 .shopTitle {
-  margin:
-    17px 0 8px;
+  margin: 15px 0 7px;
 
   text-align: left;
 
-  color: #aeb9d5;
+  color: #aab5d1;
 
-  font-size: 12px;
+  font-size: 11px;
 
   letter-spacing: 1px;
 
-  font-weight: 900;
+  font-weight: 1000;
 }
 
 .shopGrid {
@@ -540,15 +697,15 @@ button.gold {
   grid-template-columns:
     1fr 1fr;
 
-  gap: 9px;
+  gap: 8px;
 }
 
 .shopItem {
   min-width: 0;
 
-  padding: 12px;
+  padding: 10px;
 
-  border-radius: 16px;
+  border-radius: 15px;
 
   background:
     rgba(255,255,255,.055);
@@ -558,50 +715,46 @@ button.gold {
 }
 
 .shopIcon {
-  font-size: 34px;
-
+  font-size: 30px;
   line-height: 1.1;
 }
 
 .shopItem h3 {
-  margin:
-    6px 0 4px;
+  margin: 5px 0 3px;
 
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .shopItem p {
-  margin:
-    3px 0;
+  margin: 3px 0;
 
   color: #9ba7c2;
 
-  font-size: 11px;
+  font-size: 10px;
 
-  line-height: 1.35;
+  line-height: 1.3;
 }
 
 .shopItem button {
-  min-height: 36px;
+  min-height: 34px;
 
-  padding: 8px;
+  padding: 7px;
 
-  margin-top: 7px;
+  margin-top: 6px;
 
-  font-size: 11px;
+  font-size: 10px;
 }
-
 
 /* ============================================================
    MISSIONS
    ============================================================ */
 
 .mission {
-  padding: 12px;
+  padding: 10px;
 
-  margin: 8px 0;
+  margin: 7px 0;
 
-  border-radius: 14px;
+  border-radius: 13px;
 
   text-align: left;
 
@@ -612,28 +765,28 @@ button.gold {
 .missionTop {
   display: flex;
 
-  justify-content:
-    space-between;
+  justify-content: space-between;
 
-  gap: 10px;
+  gap: 8px;
 }
 
 .missionName {
-  font-weight: 900;
+  font-weight: 1000;
+  font-size: 12px;
 }
 
 .missionDescription {
-  margin-top: 4px;
+  margin-top: 3px;
 
   color: #9ca8c4;
 
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .progress {
-  height: 7px;
+  height: 6px;
 
-  margin-top: 9px;
+  margin-top: 8px;
 
   overflow: hidden;
 
@@ -655,79 +808,198 @@ button.gold {
     );
 }
 
-
 /* ============================================================
-   GAME OVER
+   ACHIEVEMENTS
    ============================================================ */
 
-#gameOverPanel .bigResult {
+.achievement {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 10px;
+
+  margin: 6px 0;
+
+  border-radius: 13px;
+
+  text-align: left;
+
+  background:
+    rgba(255,255,255,.05);
+}
+
+.achievementIcon {
+  width: 35px;
+  height: 35px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 11px;
+
+  background: rgba(255,255,255,.07);
+
+  font-size: 20px;
+}
+
+.achievement.locked {
+  opacity: .4;
+}
+
+.achievementText {
+  flex: 1;
+}
+
+.achievementName {
+  font-size: 12px;
+  font-weight: 1000;
+}
+
+.achievementDesc {
+  color: #8995b3;
+  font-size: 9px;
+  margin-top: 2px;
+}
+
+/* ============================================================
+   RESULT
+   ============================================================ */
+
+.bigResult {
   font-size:
-    clamp(38px, 12%, 45px);
+    clamp(40px, 12%, 55px);
 
   font-weight: 1000;
 
-  margin:
-    5px 0 15px;
+  margin: 5px 0 12px;
+
+  color: #fff;
 }
 
 .newBest {
-  min-height: 20px;
+  min-height: 18px;
 
   color: #ffd84c;
 
-  font-weight: 900;
+  font-weight: 1000;
 
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .hint {
   color: #7f8baa;
 
-  font-size: 11px;
+  font-size: 10px;
 
-  margin-top: 10px;
+  margin-top: 9px;
 }
 
-
-/* ============================================================
-   CREDIT
-   ============================================================ */
-
 .credit {
-  margin-top: 18px;
+  margin-top: 13px;
 
   color: #697594;
 
-  font-size: 10px;
+  font-size: 9px;
 
-  font-weight: 800;
+  font-weight: 900;
 
   letter-spacing: .7px;
-
-  text-align: center;
 }
 
-
 /* ============================================================
-   SHORT PHONE SCREENS
+   TOAST
    ============================================================ */
 
-@media (max-height: 760px) {
+#toast {
+  position: absolute;
+
+  left: 50%;
+  top: 23%;
+
+  transform:
+    translate(-50%, -10px);
+
+  padding: 8px 13px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(5,8,20,.88);
+
+  border:
+    1px solid rgba(255,255,255,.13);
+
+  box-shadow:
+    0 8px 30px rgba(0,0,0,.4);
+
+  font-size: 11px;
+
+  font-weight: 1000;
+
+  white-space: nowrap;
+
+  opacity: 0;
+
+  transition:
+    opacity .15s,
+    transform .15s;
+
+  z-index: 50;
+}
+
+#toast.show {
+  opacity: 1;
+
+  transform:
+    translate(-50%, 0);
+}
+
+/* ============================================================
+   SAVE / SETTINGS
+   ============================================================ */
+
+.dangerText {
+  color: #ff6e82;
+}
+
+.saveCode {
+  padding: 10px;
+
+  border-radius: 10px;
+
+  background: rgba(0,0,0,.25);
+
+  color: #8390ad;
+
+  font-size: 9px;
+
+  word-break: break-all;
+
+  margin: 8px 0;
+}
+
+/* ============================================================
+   SHORT PHONES
+   ============================================================ */
+
+@media (max-height: 700px) {
 
   .panel {
-    padding: 18px;
-  }
-
-  .logo {
-    font-size: 34px;
+    padding: 15px;
   }
 
   .scrollArea {
-    max-height: 270px;
+    max-height: 245px;
+  }
+
+  .logo {
+    font-size: 31px;
   }
 
 }
-
 
 /* ============================================================
    VERY SMALL PHONES
@@ -735,52 +1007,23 @@ button.gold {
 
 @media (max-width: 350px) {
 
-  #screen {
+  .panel {
     padding: 12px;
   }
 
-  .panel {
-    padding: 14px;
-  }
-
-  .logo {
-    font-size: 31px;
-  }
-
   button {
-    min-height: 46px;
+    min-height: 44px;
+  }
+
+  .shopGrid {
+    gap: 6px;
+  }
+
+  .shopItem {
+    padding: 8px;
   }
 
 }
-
-
-/* ============================================================
-   LANDSCAPE PHONES
-   ============================================================ */
-
-@media (orientation: landscape) and (max-height: 600px) {
-
-  body {
-    padding:
-      max(6px, env(safe-area-inset-top))
-      max(6px, env(safe-area-inset-right))
-      max(6px, env(safe-area-inset-bottom))
-      max(6px, env(safe-area-inset-left));
-  }
-
-  #gameWrap {
-    width:
-      min(
-        calc(100vw - 12px),
-        calc((100dvh - 12px) * 430 / 720)
-      );
-
-    max-height:
-      calc(100dvh - 12px);
-  }
-
-}
-
 
 /* ============================================================
    REDUCED MOTION
@@ -791,7 +1034,8 @@ button.gold {
   *,
   *::before,
   *::after {
-    scroll-behavior: auto !important;
+    animation-duration: .001ms !important;
+    transition-duration: .001ms !important;
   }
 
 }
@@ -799,27 +1043,37 @@ button.gold {
 </style>
 </head>
 
-
 <body>
 
 <div id="gameWrap">
 
-  <canvas
-    id="game"
-    width="430"
-    height="720"
-  ></canvas>
+<canvas
+  id="game"
+  width="430"
+  height="720"
+></canvas>
 
+<div id="ui">
 
-  <div id="ui">
+  <!-- ========================================================
+       TOP BAR
+       ======================================================== -->
 
-    <!-- TOP BAR -->
+  <div class="topbar">
 
-    <div class="topbar">
+    <div class="topGroup">
 
       <div class="badge">
         🪙 <span id="coins">0</span>
       </div>
+
+      <div class="badge">
+        💎 <span id="gems">0</span>
+      </div>
+
+    </div>
+
+    <div class="topGroup">
 
       <div class="badge">
         🏆 <span id="highScore">0</span>
@@ -827,349 +1081,436 @@ button.gold {
 
     </div>
 
+  </div>
 
-    <!-- PAUSE -->
+  <!-- ========================================================
+       PAUSE
+       ======================================================== -->
 
-    <button
-      id="pauseButton"
-      class="secondary"
-      type="button"
-      aria-label="Pause game"
+  <button
+    id="pauseButton"
+    class="secondary"
+    type="button"
+    aria-label="Pause"
+  >
+    Ⅱ
+  </button>
+
+  <!-- ========================================================
+       SCORE
+       ======================================================== -->
+
+  <div id="score">0</div>
+
+  <div id="multiplier">
+    🔥 x1
+  </div>
+
+  <div id="powerStatus"></div>
+
+  <div id="toast"></div>
+
+  <!-- ========================================================
+       PANELS
+       ======================================================== -->
+
+  <div id="screen">
+
+    <!-- ======================================================
+         MENU
+         ====================================================== -->
+
+    <div
+      class="panel"
+      id="menuPanel"
     >
-      Ⅱ
-    </button>
 
+      <div class="logo">
+        FLAPPY<br>
+        GALAXY
+      </div>
 
-    <!-- SCORE -->
+      <div class="subtitle">
+        Fly farther. Master the galaxy. Become legendary.
+      </div>
 
-    <div id="score">0</div>
+      <div class="stats">
 
-
-    <div id="screen">
-
-
-      <!-- ==================================================
-           MAIN MENU
-           ================================================== -->
-
-      <div
-        class="panel"
-        id="menuPanel"
-      >
-
-        <div class="logo">
-          FLAPPY<br>
-          GALAXY
+        <div class="stat">
+          <small>BEST SCORE</small>
+          <strong id="menuBest">0</strong>
         </div>
 
-        <div class="subtitle">
-          Fly farther. Collect coins. Unlock the galaxy.
+        <div class="stat">
+          <small>COINS</small>
+          <strong id="menuCoins">0</strong>
         </div>
 
-
-        <div class="stats">
-
-          <div class="stat">
-
-            <small>
-              BEST SCORE
-            </small>
-
-            <strong id="menuBest">
-              0
-            </strong>
-
-          </div>
-
-
-          <div class="stat">
-
-            <small>
-              COINS
-            </small>
-
-            <strong id="menuCoins">
-              0
-            </strong>
-
-          </div>
-
+        <div class="stat">
+          <small>GEMS</small>
+          <strong id="menuGems">0</strong>
         </div>
 
-
-        <button
-          id="playBtn"
-          type="button"
-        >
-          🚀 PLAY
-        </button>
-
-
-        <button
-          id="shopBtn"
-          class="gold"
-          type="button"
-        >
-          🛒 SHOP & UPGRADES
-        </button>
-
-
-        <button
-          id="missionsBtn"
-          class="secondary"
-          type="button"
-        >
-          🎯 MISSIONS
-        </button>
-
-
-        <div class="hint">
-          SPACE / ↑ / TAP to flap
-        </div>
-
-
-        <div class="credit">
-          Made by LilVellux
+        <div class="stat">
+          <small>RUNS</small>
+          <strong id="menuGames">0</strong>
         </div>
 
       </div>
 
+      <button id="playBtn" type="button">
+        🚀 PLAY
+      </button>
 
-      <!-- ==================================================
-           SHOP
-           ================================================== -->
+      <button
+        id="shopBtn"
+        class="gold"
+        type="button"
+      >
+        🛒 SHOP
+      </button>
+
+      <button
+        id="missionsBtn"
+        class="secondary"
+        type="button"
+      >
+        🎯 MISSIONS
+      </button>
+
+      <button
+        id="achievementsBtn"
+        class="secondary"
+        type="button"
+      >
+        🏆 ACHIEVEMENTS
+      </button>
+
+      <button
+        id="settingsBtn"
+        class="secondary"
+        type="button"
+      >
+        ⚙️ SETTINGS
+      </button>
+
+      <div class="hint">
+        TAP / SPACE / ↑ to flap
+      </div>
+
+      <div class="credit">
+        Made by LilVellux
+      </div>
+
+    </div>
+
+    <!-- ======================================================
+         SHOP
+         ====================================================== -->
+
+    <div
+      class="panel hidden"
+      id="shopPanel"
+    >
 
       <div
-        class="panel hidden"
-        id="shopPanel"
+        class="logo"
+        style="font-size:34px"
       >
+        GALAXY SHOP
+      </div>
 
-        <div
-          class="logo"
-          style="font-size:34px"
-        >
+      <div class="subtitle">
+        Upgrade your pilot and unlock legendary birds.
+      </div>
+
+      <div class="badge">
+        🪙 <span id="shopCoins">0</span>
+        &nbsp;&nbsp;
+        💎 <span id="shopGems">0</span>
+      </div>
+
+      <div class="scrollArea">
+
+        <div class="shopTitle">
           UPGRADES
         </div>
 
-
-        <div class="subtitle">
-          Spend your coins and customize your bird.
-        </div>
-
-
-        <div class="badge">
-          🪙 <span id="shopCoins">0</span>
-        </div>
-
-
-        <div class="scrollArea">
-
-          <div class="shopTitle">
-            POWER UP
-          </div>
-
-
-          <div
-            id="upgradeGrid"
-            class="shopGrid"
-          ></div>
-
-
-          <div class="shopTitle">
-            BIRD SKINS
-          </div>
-
-
-          <div
-            id="skinGrid"
-            class="shopGrid"
-          ></div>
-
-        </div>
-
-
-        <button
-          id="backShop"
-          class="secondary"
-          type="button"
-        >
-          ← BACK
-        </button>
-
-      </div>
-
-
-      <!-- ==================================================
-           MISSIONS
-           ================================================== -->
-
-      <div
-        class="panel hidden"
-        id="missionsPanel"
-      >
-
         <div
-          class="logo"
-          style="font-size:34px"
-        >
-          MISSIONS
-        </div>
-
-
-        <div class="subtitle">
-          Complete challenges and earn bonus coins.
-        </div>
-
-
-        <div id="missionList"></div>
-
-
-        <button
-          id="backMissions"
-          class="secondary"
-          type="button"
-        >
-          ← BACK
-        </button>
-
-      </div>
-
-
-      <!-- ==================================================
-           GAME OVER
-           ================================================== -->
-
-      <div
-        class="panel hidden"
-        id="gameOverPanel"
-      >
-
-        <div
-          class="logo"
-          style="font-size:34px"
-        >
-          RUN OVER
-        </div>
-
-
-        <div class="bigResult">
-
-          <span id="finalScore">
-            0
-          </span>
-
-        </div>
-
-
-        <div class="stats">
-
-          <div class="stat">
-
-            <small>
-              RUN COINS
-            </small>
-
-            <strong id="finalCoins">
-              0
-            </strong>
-
-          </div>
-
-
-          <div class="stat">
-
-            <small>
-              BEST
-            </small>
-
-            <strong id="finalBest">
-              0
-            </strong>
-
-          </div>
-
-        </div>
-
-
-        <div
-          class="newBest"
-          id="newBest"
+          id="upgradeGrid"
+          class="shopGrid"
         ></div>
 
-
-        <button
-          id="retryBtn"
-          type="button"
-        >
-          🔥 PLAY AGAIN
-        </button>
-
-
-        <button
-          id="gameOverShop"
-          class="gold"
-          type="button"
-        >
-          🛒 UPGRADE
-        </button>
-
-
-        <button
-          id="menuBtn"
-          class="secondary"
-          type="button"
-        >
-          MENU
-        </button>
-
-
-        <div class="credit">
-          Made by LilVellux
+        <div class="shopTitle">
+          BIRD SKINS
         </div>
-
-      </div>
-
-
-      <!-- ==================================================
-           PAUSE
-           ================================================== -->
-
-      <div
-        class="panel hidden"
-        id="pausePanel"
-      >
 
         <div
-          class="logo"
-          style="font-size:36px"
-        >
-          PAUSED
-        </div>
-
-
-        <div class="subtitle">
-          Take a breath. Your run is waiting.
-        </div>
-
-
-        <button
-          id="resumeBtn"
-          type="button"
-        >
-          ▶ RESUME
-        </button>
-
-
-        <button
-          id="pauseMenuBtn"
-          class="secondary"
-          type="button"
-        >
-          MENU
-        </button>
+          id="skinGrid"
+          class="shopGrid"
+        ></div>
 
       </div>
 
+      <button
+        id="backShop"
+        class="secondary"
+        type="button"
+      >
+        ← BACK
+      </button>
+
+    </div>
+
+    <!-- ======================================================
+         MISSIONS
+         ====================================================== -->
+
+    <div
+      class="panel hidden"
+      id="missionsPanel"
+    >
+
+      <div
+        class="logo"
+        style="font-size:34px"
+      >
+        MISSIONS
+      </div>
+
+      <div class="subtitle">
+        Complete challenges and automatically earn rewards.
+      </div>
+
+      <div
+        id="missionList"
+        class="scrollArea"
+      ></div>
+
+      <button
+        id="backMissions"
+        class="secondary"
+        type="button"
+      >
+        ← BACK
+      </button>
+
+    </div>
+
+    <!-- ======================================================
+         ACHIEVEMENTS
+         ====================================================== -->
+
+    <div
+      class="panel hidden"
+      id="achievementsPanel"
+    >
+
+      <div
+        class="logo"
+        style="font-size:32px"
+      >
+        ACHIEVEMENTS
+      </div>
+
+      <div class="subtitle">
+        Prove your skills across the galaxy.
+      </div>
+
+      <div
+        id="achievementList"
+        class="scrollArea"
+      ></div>
+
+      <button
+        id="backAchievements"
+        class="secondary"
+        type="button"
+      >
+        ← BACK
+      </button>
+
+    </div>
+
+    <!-- ======================================================
+         SETTINGS
+         ====================================================== -->
+
+    <div
+      class="panel hidden"
+      id="settingsPanel"
+    >
+
+      <div
+        class="logo"
+        style="font-size:32px"
+      >
+        SETTINGS
+      </div>
+
+      <div class="subtitle">
+        Your progress is stored on this device.
+      </div>
+
+      <button
+        id="exportSaveBtn"
+        class="green"
+        type="button"
+      >
+        📦 EXPORT SAVE
+      </button>
+
+      <button
+        id="importSaveBtn"
+        class="secondary"
+        type="button"
+      >
+        📥 IMPORT SAVE
+      </button>
+
+      <button
+        id="resetSaveBtn"
+        class="red"
+        type="button"
+      >
+        🗑️ RESET ALL DATA
+      </button>
+
+      <div class="saveCode">
+        Save system: v4<br>
+        Primary + backup local save
+      </div>
+
+      <button
+        id="backSettings"
+        class="secondary"
+        type="button"
+      >
+        ← BACK
+      </button>
+
+    </div>
+
+    <!-- ======================================================
+         GAME OVER
+         ====================================================== -->
+
+    <div
+      class="panel hidden"
+      id="gameOverPanel"
+    >
+
+      <div
+        class="logo"
+        style="font-size:34px"
+      >
+        RUN OVER
+      </div>
+
+      <div class="bigResult">
+        <span id="finalScore">0</span>
+      </div>
+
+      <div class="stats">
+
+        <div class="stat">
+          <small>COINS</small>
+          <strong id="finalCoins">0</strong>
+        </div>
+
+        <div class="stat">
+          <small>GEMS</small>
+          <strong id="finalGems">0</strong>
+        </div>
+
+        <div class="stat">
+          <small>BEST</small>
+          <strong id="finalBest">0</strong>
+        </div>
+
+        <div class="stat">
+          <small>MAX COMBO</small>
+          <strong id="finalCombo">x1</strong>
+        </div>
+
+      </div>
+
+      <div
+        class="newBest"
+        id="newBest"
+      ></div>
+
+      <button
+        id="retryBtn"
+        type="button"
+      >
+        🔥 PLAY AGAIN
+      </button>
+
+      <button
+        id="reviveBtn"
+        class="gold"
+        type="button"
+      >
+        ❤️ REVIVE
+      </button>
+
+      <button
+        id="gameOverShop"
+        class="secondary"
+        type="button"
+      >
+        🛒 SHOP
+      </button>
+
+      <button
+        id="menuBtn"
+        class="secondary"
+        type="button"
+      >
+        MENU
+      </button>
+
+      <div class="credit">
+        Made by LilVellux
+      </div>
+
+    </div>
+
+    <!-- ======================================================
+         PAUSE
+         ====================================================== -->
+
+    <div
+      class="panel hidden"
+      id="pausePanel"
+    >
+
+      <div
+        class="logo"
+        style="font-size:36px"
+      >
+        PAUSED
+      </div>
+
+      <div class="subtitle">
+        Your galaxy adventure is waiting.
+      </div>
+
+      <button
+        id="resumeBtn"
+        type="button"
+      >
+        ▶ RESUME
+      </button>
+
+      <button
+        id="pauseMenuBtn"
+        class="secondary"
+        type="button"
+      >
+        MENU
+      </button>
 
     </div>
 
@@ -1177,60 +1518,109 @@ button.gold {
 
 </div>
 
+<input
+  id="importInput"
+  type="file"
+  accept=".json,application/json"
+  style="display:none"
+>
 
 <script>
 
 "use strict";
 
-
 /* ============================================================
-   GAME SETUP
+   CORE
    ============================================================ */
 
 const canvas =
   document.getElementById("game");
 
 const ctx =
-  canvas.getContext("2d");
+  canvas.getContext("2d", {
+    alpha: false
+  });
 
-const W =
-  canvas.width;
+const W = 430;
+const H = 720;
 
-const H =
-  canvas.height;
+const SAVE_KEY =
+  "LilVelluxFlappyGalaxy_v4";
+
+const BACKUP_KEY =
+  "LilVelluxFlappyGalaxy_v4_backup";
+
+const SAVE_VERSION = 4;
+
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+
+function clamp(
+  value,
+  min,
+  max
+) {
+  return Math.max(
+    min,
+    Math.min(max, value)
+  );
+}
+
+function random(
+  min,
+  max
+) {
+  return (
+    Math.random() *
+    (max - min) +
+    min
+  );
+}
+
+function pick(array) {
+  return array[
+    Math.floor(
+      Math.random() * array.length
+    )
+  ];
+}
 
 
 /* ============================================================
    SAVE DATA
    ============================================================ */
 
-const SAVE_KEY =
-  "LilVelluxFlappyGalaxy_v3";
-
-
 const DEFAULT_SAVE = {
 
+  version: SAVE_VERSION,
+
   coins: 0,
+  gems: 0,
 
   highScore: 0,
 
   totalFlaps: 0,
-
   totalCoins: 0,
+  totalGems: 0,
 
   gamesPlayed: 0,
+
+  totalScore: 0,
+
+  bestCombo: 1,
 
   upgrades: {
 
     jump: 0,
-
     coin: 0,
-
     shield: 0,
-
     magnet: 0,
-
-    slow: 0
+    slow: 0,
+    dash: 0,
+    luck: 0,
+    revive: 0
 
   },
 
@@ -1240,44 +1630,207 @@ const DEFAULT_SAVE = {
       "classic"
     ],
 
-    equipped:
-      "classic"
+    equipped: "classic"
 
   },
 
   missions: {
 
     score25: 0,
-
     coins50: 0,
-
     games10: 0,
-
-    score50: 0
+    score50: 0,
+    gems10: 0,
+    combo10: 0,
+    powerups20: 0,
+    meteors10: 0
 
   },
 
   missionClaimed: {
 
     score25: false,
-
     coins50: false,
-
     games10: false,
+    score50: false,
+    gems10: false,
+    combo10: false,
+    powerups20: false,
+    meteors10: false
 
-    score50: false
+  },
 
-  }
+  achievements: {},
+
+  settings: {
+
+    sound: true
+
+  },
+
+  lastSaved: 0
 
 };
 
 
-function cloneDefault() {
+function deepClone(
+  value
+) {
 
   return JSON.parse(
+    JSON.stringify(value)
+  );
+
+}
+
+
+function createDefaultSave() {
+
+  return deepClone(
+    DEFAULT_SAVE
+  );
+
+}
+
+
+/*
+   Merge old saves safely.
+
+   This means future versions can add properties
+   without destroying old player progress.
+*/
+
+function mergeSave(
+  loaded
+) {
+
+  const base =
+    createDefaultSave();
+
+  const result = {
+    ...base,
+    ...loaded
+  };
+
+  result.upgrades = {
+    ...base.upgrades,
+    ...(loaded.upgrades || {})
+  };
+
+  result.skins = {
+    ...base.skins,
+    ...(loaded.skins || {})
+  };
+
+  result.missions = {
+    ...base.missions,
+    ...(loaded.missions || {})
+  };
+
+  result.missionClaimed = {
+    ...base.missionClaimed,
+    ...(loaded.missionClaimed || {})
+  };
+
+  result.settings = {
+    ...base.settings,
+    ...(loaded.settings || {})
+  };
+
+  result.version =
+    SAVE_VERSION;
+
+  return result;
+
+}
+
+
+/*
+   Lightweight checksum.
+
+   It isn't intended to be cryptographic security.
+   Its purpose is to detect accidentally corrupted
+   local save strings.
+*/
+
+function checksum(
+  text
+) {
+
+  let hash = 0;
+
+  for (
+    let i = 0;
+    i < text.length;
+    i++
+  ) {
+
+    hash =
+      (
+        (hash << 5) -
+        hash +
+        text.charCodeAt(i)
+      ) |
+      0;
+
+  }
+
+  return String(
+    Math.abs(hash)
+  );
+
+}
+
+
+function makeSavePackage() {
+
+  const data = {
+    ...save,
+    lastSaved:
+      Date.now()
+  };
+
+  const json =
+    JSON.stringify(data);
+
+  return {
+
+    version: SAVE_VERSION,
+
+    checksum:
+      checksum(json),
+
+    data
+
+  };
+
+}
+
+
+function validateSavePackage(
+  pkg
+) {
+
+  if (
+    !pkg ||
+    typeof pkg !== "object" ||
+    !pkg.data
+  ) {
+
+    return false;
+
+  }
+
+  const json =
     JSON.stringify(
-      DEFAULT_SAVE
-    )
+      pkg.data
+    );
+
+  return (
+    String(
+      pkg.checksum
+    ) ===
+    checksum(json)
   );
 
 }
@@ -1287,70 +1840,69 @@ function loadSave() {
 
   try {
 
-    const raw =
+    const primaryRaw =
       localStorage.getItem(
         SAVE_KEY
       );
 
-    if (!raw) {
+    if (primaryRaw) {
 
-      return cloneDefault();
+      const primary =
+        JSON.parse(
+          primaryRaw
+        );
 
-    }
+      if (
+        validateSavePackage(
+          primary
+        )
+      ) {
 
-
-    const loaded =
-      JSON.parse(raw);
-
-    const base =
-      cloneDefault();
-
-
-    return {
-
-      ...base,
-
-      ...loaded,
-
-      upgrades: {
-
-        ...base.upgrades,
-
-        ...(loaded.upgrades || {})
-
-      },
-
-      skins: {
-
-        ...base.skins,
-
-        ...(loaded.skins || {})
-
-      },
-
-      missions: {
-
-        ...base.missions,
-
-        ...(loaded.missions || {})
-
-      },
-
-      missionClaimed: {
-
-        ...base.missionClaimed,
-
-        ...(loaded.missionClaimed || {})
+        return mergeSave(
+          primary.data
+        );
 
       }
 
-    };
+    }
 
-  } catch {
+  } catch {}
 
-    return cloneDefault();
+  /*
+     If primary is damaged, try backup.
+  */
 
-  }
+  try {
+
+    const backupRaw =
+      localStorage.getItem(
+        BACKUP_KEY
+      );
+
+    if (backupRaw) {
+
+      const backup =
+        JSON.parse(
+          backupRaw
+        );
+
+      if (
+        validateSavePackage(
+          backup
+        )
+      ) {
+
+        return mergeSave(
+          backup.data
+        );
+
+      }
+
+    }
+
+  } catch {}
+
+  return createDefaultSave();
 
 }
 
@@ -1363,12 +1915,61 @@ function saveGame() {
 
   try {
 
+    const pkg =
+      makeSavePackage();
+
+    const json =
+      JSON.stringify(pkg);
+
+    /*
+       Backup the previous valid save first.
+    */
+
+    const previous =
+      localStorage.getItem(
+        SAVE_KEY
+      );
+
+    if (previous) {
+
+      localStorage.setItem(
+        BACKUP_KEY,
+        previous
+      );
+
+    }
+
     localStorage.setItem(
       SAVE_KEY,
-      JSON.stringify(save)
+      json
     );
 
-  } catch {}
+  } catch {
+
+    /*
+       Storage can fail in private browsing
+       or if the device is full.
+    */
+
+  }
+
+}
+
+
+let saveTimer = null;
+
+
+function queueSave() {
+
+  clearTimeout(
+    saveTimer
+  );
+
+  saveTimer =
+    setTimeout(
+      saveGame,
+      350
+    );
 
 }
 
@@ -1383,56 +1984,80 @@ const SKINS = {
     name: "Classic",
     icon: "🐤",
     color: "#ffe45e",
-    price: 0
+    price: 0,
+    gemPrice: 0
   },
 
   ruby: {
     name: "Ruby",
     icon: "🔥",
     color: "#ff4d6d",
-    price: 100
+    price: 100,
+    gemPrice: 0
   },
 
   ocean: {
     name: "Ocean",
     icon: "🌊",
     color: "#43d9ff",
-    price: 250
+    price: 250,
+    gemPrice: 0
   },
 
   toxic: {
     name: "Toxic",
     icon: "☢️",
     color: "#8cff52",
-    price: 500
+    price: 500,
+    gemPrice: 0
   },
 
   cosmic: {
     name: "Cosmic",
     icon: "🌌",
     color: "#b78cff",
-    price: 1000
+    price: 1000,
+    gemPrice: 0
   },
 
   golden: {
     name: "Golden",
     icon: "👑",
     color: "#ffd54a",
-    price: 2500
+    price: 2500,
+    gemPrice: 0
   },
 
   neon: {
     name: "Neon",
     icon: "💠",
     color: "#00fff2",
-    price: 5000
+    price: 5000,
+    gemPrice: 0
   },
 
   galaxy: {
     name: "Galaxy",
     icon: "🌠",
     color: "#e68cff",
-    price: 10000
+    price: 10000,
+    gemPrice: 0
+  },
+
+  plasma: {
+    name: "Plasma",
+    icon: "⚡",
+    color: "#ff69ff",
+    price: 20000,
+    gemPrice: 0
+  },
+
+  legendary: {
+    name: "Legendary",
+    icon: "👽",
+    color: "#64ffcc",
+    price: 40000,
+    gemPrice: 0
   }
 
 };
@@ -1447,8 +2072,7 @@ const UPGRADES = {
   jump: {
     name: "Jet Wings",
     icon: "🚀",
-    description:
-      "Increase flap power.",
+    description: "Stronger flap power.",
     max: 5,
     base: 80
   },
@@ -1456,8 +2080,7 @@ const UPGRADES = {
   coin: {
     name: "Coin Bonus",
     icon: "🪙",
-    description:
-      "Earn extra coins.",
+    description: "Extra coins from pickups.",
     max: 5,
     base: 100
   },
@@ -1465,8 +2088,7 @@ const UPGRADES = {
   shield: {
     name: "Shield",
     icon: "🛡️",
-    description:
-      "Begin runs with a shield.",
+    description: "Start every run protected.",
     max: 3,
     base: 180
   },
@@ -1474,8 +2096,7 @@ const UPGRADES = {
   magnet: {
     name: "Coin Magnet",
     icon: "🧲",
-    description:
-      "Collect coins from farther away.",
+    description: "Pull coins from farther away.",
     max: 5,
     base: 150
   },
@@ -1483,98 +2104,281 @@ const UPGRADES = {
   slow: {
     name: "Time Warp",
     icon: "⏱️",
-    description:
-      "Slightly reduce pipe speed.",
+    description: "Reduce galaxy movement speed.",
     max: 5,
     base: 220
+  },
+
+  dash: {
+    name: "Star Dash",
+    icon: "💨",
+    description: "Improves dash cooldown.",
+    max: 5,
+    base: 300
+  },
+
+  luck: {
+    name: "Lucky Pilot",
+    icon: "🍀",
+    description: "Better rare pickup chances.",
+    max: 5,
+    base: 350
+  },
+
+  revive: {
+    name: "Phoenix Core",
+    icon: "❤️",
+    description: "Adds extra revive charges.",
+    max: 3,
+    base: 750
   }
 
 };
 
 
-function upgradeCost(key) {
+function upgradeCost(
+  key
+) {
 
   const level =
     save.upgrades[key];
 
-  return (
+  return Math.floor(
     UPGRADES[key].base *
-    (level + 1)
+    Math.pow(1.35, level)
   );
 
 }
 
 
 /* ============================================================
-   GAME STATE
+   MISSIONS
    ============================================================ */
 
-let gameState =
-  "menu";
+const MISSIONS = [
 
-let bird =
-  null;
+  {
+    key: "score25",
+    name: "High Flyer",
+    description: "Reach a score of 25.",
+    max: 25,
+    reward: 150
+  },
 
-let pipes =
-  [];
+  {
+    key: "coins50",
+    name: "Treasure Hunter",
+    description: "Collect 50 coins.",
+    max: 50,
+    reward: 250
+  },
 
-let coins =
-  [];
+  {
+    key: "games10",
+    name: "Persistent",
+    description: "Play 10 games.",
+    max: 10,
+    reward: 300
+  },
 
-let particles =
-  [];
+  {
+    key: "score50",
+    name: "Galaxy Master",
+    description: "Reach a score of 50.",
+    max: 50,
+    reward: 500
+  },
 
-let stars =
-  [];
+  {
+    key: "gems10",
+    name: "Gem Hunter",
+    description: "Collect 10 gems.",
+    max: 10,
+    reward: 500
+  },
 
-let clouds =
-  [];
+  {
+    key: "combo10",
+    name: "Combo King",
+    description: "Reach a x10 multiplier.",
+    max: 10,
+    reward: 700
+  },
 
-let score =
-  0;
+  {
+    key: "powerups20",
+    name: "Power Hungry",
+    description: "Collect 20 power-ups.",
+    max: 20,
+    reward: 600
+  },
 
-let runCoins =
-  0;
+  {
+    key: "meteors10",
+    name: "Meteor Dodger",
+    description: "Survive 10 meteor encounters.",
+    max: 10,
+    reward: 800
+  }
 
-let frame =
-  0;
-
-let speed =
-  3;
-
-let shieldActive =
-  false;
-
-let lastTime =
-  0;
-
-let audioContext =
-  null;
+];
 
 
 /* ============================================================
-   BACKGROUND OBJECTS
+   ACHIEVEMENTS
+   ============================================================ */
+
+const ACHIEVEMENTS = [
+
+  {
+    key: "firstRun",
+    icon: "🚀",
+    name: "Lift Off",
+    description: "Play your first game."
+  },
+
+  {
+    key: "score25",
+    icon: "⭐",
+    name: "Rising Star",
+    description: "Reach score 25."
+  },
+
+  {
+    key: "score50",
+    icon: "🌟",
+    name: "Super Star",
+    description: "Reach score 50."
+  },
+
+  {
+    key: "score100",
+    icon: "👑",
+    name: "Galaxy Legend",
+    description: "Reach score 100."
+  },
+
+  {
+    key: "coins100",
+    icon: "🪙",
+    name: "Coin Collector",
+    description: "Collect 100 total coins."
+  },
+
+  {
+    key: "gems25",
+    icon: "💎",
+    name: "Gem Lord",
+    description: "Collect 25 gems."
+  },
+
+  {
+    key: "combo10",
+    icon: "🔥",
+    name: "Combo Master",
+    description: "Reach x10 multiplier."
+  },
+
+  {
+    key: "powerup",
+    icon: "⚡",
+    name: "Powered Up",
+    description: "Collect your first power-up."
+  },
+
+  {
+    key: "boss",
+    icon: "👾",
+    name: "Boss Hunter",
+    description: "Survive a boss encounter."
+  },
+
+  {
+    key: "million",
+    icon: "🌌",
+    name: "Beyond The Stars",
+    description: "Reach score 250."
+  }
+
+];
+
+
+/* ============================================================
+   GAME STATE
+   ============================================================ */
+
+let gameState = "menu";
+
+let bird = null;
+
+let pipes = [];
+let coins = [];
+let gems = [];
+let powerups = [];
+let meteors = [];
+let ufos = [];
+let particles = [];
+let stars = [];
+let clouds = [];
+let shockwaves = [];
+
+let score = 0;
+let runCoins = 0;
+let runGems = 0;
+
+let frame = 0;
+
+let speed = 3;
+
+let shieldActive = false;
+
+let multiplier = 1;
+let comboTimer = 0;
+let maxCombo = 1;
+
+let dashCooldown = 0;
+let dashActive = false;
+let dashTimer = 0;
+
+let slowTimer = 0;
+let magnetTimer = 0;
+let coinDoubleTimer = 0;
+
+let reviveCharges = 0;
+let hasRevived = false;
+
+let boss = null;
+
+let zone = 0;
+
+let screenShake = 0;
+
+let lastTime = 0;
+
+let audioContext = null;
+
+let toastTimer = null;
+
+
+/* ============================================================
+   BACKGROUND
    ============================================================ */
 
 for (
   let i = 0;
-  i < 110;
+  i < 130;
   i++
 ) {
 
   stars.push({
 
-    x:
-      Math.random() * W,
+    x: Math.random() * W,
+    y: Math.random() * H,
 
-    y:
-      Math.random() * H,
-
-    r:
-      Math.random() * 1.8 + .2,
+    r: Math.random() * 1.8 + .2,
 
     speed:
-      Math.random() * .5 + .05,
+      Math.random() * .55 + .04,
 
     alpha:
       Math.random() * .8 + .2
@@ -1586,26 +2390,21 @@ for (
 
 for (
   let i = 0;
-  i < 12;
+  i < 14;
   i++
 ) {
 
   clouds.push({
 
-    x:
-      Math.random() * W,
+    x: Math.random() * W,
 
-    y:
-      Math.random() * H,
+    y: random(60, H - 100),
 
-    width:
-      Math.random() * 100 + 50,
+    width: random(50, 150),
 
-    speed:
-      Math.random() * .25 + .05,
+    speed: random(.03, .18),
 
-    alpha:
-      Math.random() * .08 + .03
+    alpha: random(.025, .08)
 
   });
 
@@ -1616,7 +2415,17 @@ for (
    AUDIO
    ============================================================ */
 
-function playSound(type) {
+function playSound(
+  type
+) {
+
+  if (
+    !save.settings.sound
+  ) {
+
+    return;
+
+  }
 
   try {
 
@@ -1630,7 +2439,6 @@ function playSound(type) {
 
     }
 
-
     if (
       audioContext.state ===
       "suspended"
@@ -1640,13 +2448,11 @@ function playSound(type) {
 
     }
 
-
     const oscillator =
       audioContext.createOscillator();
 
     const gain =
       audioContext.createGain();
-
 
     oscillator.connect(gain);
 
@@ -1654,25 +2460,48 @@ function playSound(type) {
       audioContext.destination
     );
 
-
     const sounds = {
 
-      flap: [430, .055],
+      flap:
+        [430, .055],
 
-      coin: [900, .08],
+      coin:
+        [900, .08],
 
-      score: [650, .1],
+      gem:
+        [1250, .12],
 
-      buy: [720, .1],
+      score:
+        [650, .1],
 
-      shield: [250, .16],
+      power:
+        [750, .16],
 
-      hit: [90, .25],
+      shield:
+        [250, .18],
 
-      mission: [1100, .18]
+      hit:
+        [90, .25],
+
+      mission:
+        [1100, .18],
+
+      dash:
+        [160, .16],
+
+      boss:
+        [75, .45],
+
+      revive:
+        [520, .3],
+
+      achievement:
+        [1400, .25],
+
+      crate:
+        [550, .2]
 
     };
-
 
     const [
       frequency,
@@ -1681,22 +2510,20 @@ function playSound(type) {
       sounds[type] ||
       sounds.flap;
 
-
     oscillator.frequency.value =
       frequency;
-
 
     oscillator.type =
       type === "hit"
         ? "sawtooth"
-        : "sine";
-
+        : type === "boss"
+          ? "square"
+          : "sine";
 
     gain.gain.setValueAtTime(
       .06,
       audioContext.currentTime
     );
-
 
     gain.gain.exponentialRampToValueAtTime(
       .001,
@@ -1704,9 +2531,7 @@ function playSound(type) {
       duration
     );
 
-
     oscillator.start();
-
 
     oscillator.stop(
       audioContext.currentTime +
@@ -1726,7 +2551,8 @@ function createParticles(
   x,
   y,
   color,
-  amount = 10
+  amount = 10,
+  power = 1
 ) {
 
   for (
@@ -1738,14 +2564,17 @@ function createParticles(
     particles.push({
 
       x,
-
       y,
 
       vx:
-        (Math.random() - .5) * 6,
+        (Math.random() - .5) *
+        6 *
+        power,
 
       vy:
-        (Math.random() - .5) * 6,
+        (Math.random() - .5) *
+        6 *
+        power,
 
       gravity:
         .08,
@@ -1765,6 +2594,69 @@ function createParticles(
 }
 
 
+function createShockwave(
+  x,
+  y,
+  color
+) {
+
+  shockwaves.push({
+
+    x,
+    y,
+
+    radius: 5,
+
+    maxRadius: 90,
+
+    life: 1,
+
+    color
+
+  });
+
+}
+
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+
+function showToast(
+  message
+) {
+
+  const toast =
+    document.getElementById(
+      "toast"
+    );
+
+  toast.textContent =
+    message;
+
+  toast.classList.add(
+    "show"
+  );
+
+  clearTimeout(
+    toastTimer
+  );
+
+  toastTimer =
+    setTimeout(
+      () => {
+
+        toast.classList.remove(
+          "show"
+        );
+
+      },
+      1300
+    );
+
+}
+
+
 /* ============================================================
    START GAME
    ============================================================ */
@@ -1774,69 +2666,79 @@ function startGame() {
   gameState =
     "playing";
 
-  score =
-    0;
+  score = 0;
+  runCoins = 0;
+  runGems = 0;
 
-  runCoins =
-    0;
+  frame = 0;
 
-  frame =
-    0;
+  speed = 3;
 
-  speed =
-    3;
+  pipes = [];
+  coins = [];
+  gems = [];
+  powerups = [];
+  meteors = [];
+  ufos = [];
+  particles = [];
+  shockwaves = [];
 
-  pipes =
-    [];
+  multiplier = 1;
+  comboTimer = 0;
+  maxCombo = 1;
 
-  coins =
-    [];
+  slowTimer = 0;
+  magnetTimer = 0;
+  coinDoubleTimer = 0;
 
-  particles =
-    [];
+  dashCooldown = 0;
+  dashActive = false;
+  dashTimer = 0;
 
+  boss = null;
+  zone = 0;
 
-  bird = {
+  hasRevived = false;
 
-    x:
-      105,
-
-    y:
-      H / 2,
-
-    vy:
-      0,
-
-    rotation:
-      0
-
-  };
-
+  reviveCharges =
+    save.upgrades.revive;
 
   shieldActive =
     save.upgrades.shield > 0;
 
+  bird = {
+
+    x: 105,
+
+    y: H / 2,
+
+    vy: 0,
+
+    rotation: 0,
+
+    pulse: 0
+
+  };
 
   save.gamesPlayed++;
 
-
   updateMissionProgress();
 
-  saveGame();
+  unlockAchievement(
+    "firstRun"
+  );
 
+  queueSave();
 
   hidePanels();
-
 
   document.getElementById(
     "pauseButton"
   ).style.display =
     "block";
 
-
   lastTime =
     performance.now();
-
 
   updateUI();
 
@@ -1858,34 +2760,88 @@ function flap() {
 
   }
 
-
   const power =
     -8 -
     save.upgrades.jump * .7;
 
-
   bird.vy =
     power;
 
+  bird.pulse =
+    1;
 
   save.totalFlaps++;
-
 
   const skin =
     SKINS[
       save.skins.equipped
     ];
 
-
   createParticles(
     bird.x - 14,
     bird.y + 8,
     skin.color,
-    6
+    7
   );
 
-
   playSound("flap");
+
+}
+
+
+/* ============================================================
+   DASH
+   ============================================================ */
+
+function dash() {
+
+  if (
+    gameState !==
+    "playing"
+  ) {
+
+    return;
+
+  }
+
+  if (
+    dashCooldown > 0
+  ) {
+
+    return;
+
+  }
+
+  dashActive = true;
+
+  dashTimer =
+    24;
+
+  dashCooldown =
+    Math.max(
+      75 -
+      save.upgrades.dash * 9,
+      25
+    );
+
+  bird.vy =
+    -9;
+
+  createShockwave(
+    bird.x,
+    bird.y,
+    "#59f3ff"
+  );
+
+  createParticles(
+    bird.x,
+    bird.y,
+    "#59f3ff",
+    25,
+    1.5
+  );
+
+  playSound("dash");
 
 }
 
@@ -1898,26 +2854,22 @@ function createPipe() {
 
   const gap =
     Math.max(
-      160 - score * .9,
-      108
+      166 -
+      score * .72,
+      105
     );
 
-
-  const margin =
-    80;
-
+  const margin = 78;
 
   const available =
     H -
     gap -
     margin * 2;
 
-
   const top =
     Math.random() *
     available +
     margin;
-
 
   pipes.push({
 
@@ -1937,12 +2889,14 @@ function createPipe() {
 
   });
 
+  /*
+     Coin formation.
+  */
 
   const coinCount =
     score >= 30
       ? 2
       : 1;
-
 
   for (
     let i = 0;
@@ -1976,6 +2930,189 @@ function createPipe() {
 
   }
 
+  /*
+     Chance for a gem.
+  */
+
+  const gemChance =
+    .055 +
+    save.upgrades.luck * .012;
+
+  if (
+    Math.random() <
+    gemChance
+  ) {
+
+    gems.push({
+
+      x:
+        W + 120,
+
+      y:
+        top + gap / 2,
+
+      pulse:
+        Math.random() * 6,
+
+      collected:
+        false
+
+    });
+
+  }
+
+  /*
+     Chance for a power-up.
+  */
+
+  const powerChance =
+    .075 +
+    save.upgrades.luck * .015;
+
+  if (
+    Math.random() <
+    powerChance
+  ) {
+
+    powerups.push({
+
+      x:
+        W + 170,
+
+      y:
+        top + gap / 2 +
+        random(-45,45),
+
+      type:
+        pick([
+          "shield",
+          "magnet",
+          "slow",
+          "double",
+          "boost"
+        ]),
+
+      spin:
+        Math.random() * 6,
+
+      collected:
+        false
+
+    });
+
+  }
+
+}
+
+
+/* ============================================================
+   HAZARDS
+   ============================================================ */
+
+function spawnMeteor() {
+
+  meteors.push({
+
+    x:
+      W + 60,
+
+    y:
+      random(80, H - 90),
+
+    radius:
+      random(13, 25),
+
+    vx:
+      random(4, 7),
+
+    rotation:
+      Math.random() * 6,
+
+    vr:
+      random(-.08,.08),
+
+    counted: false
+
+  });
+
+}
+
+
+function spawnUFO() {
+
+  ufos.push({
+
+    x:
+      W + 80,
+
+    y:
+      random(90, H - 100),
+
+    baseY:
+      random(90, H - 100),
+
+    t:
+      Math.random() * 10,
+
+    speed:
+      random(2.2, 3.8),
+
+    counted: false
+
+  });
+
+}
+
+
+/* ============================================================
+   BOSS
+   ============================================================ */
+
+function spawnBoss() {
+
+  if (boss) {
+
+    return;
+
+  }
+
+  boss = {
+
+    x:
+      W + 120,
+
+    y:
+      H / 2,
+
+    targetY:
+      H / 2,
+
+    hp:
+      3,
+
+    maxHp:
+      3,
+
+    t: 0,
+
+    active: true
+
+  };
+
+  playSound("boss");
+
+  showToast(
+    "👾 BOSS INCOMING!"
+  );
+
+  createParticles(
+    W,
+    H / 2,
+    "#ff4de1",
+    40,
+    2
+  );
+
 }
 
 
@@ -1983,11 +3120,14 @@ function createPipe() {
    COLLISION
    ============================================================ */
 
-function pipeCollision(pipe) {
+function pipeCollision(
+  pipe
+) {
 
   const radius =
-    17;
-
+    dashActive
+      ? 15
+      : 17;
 
   return (
 
@@ -2010,382 +3150,477 @@ function pipeCollision(pipe) {
 }
 
 
-/* ============================================================
-   UPDATE
-   ============================================================ */
+function circleCollision(
+  x1,
+  y1,
+  r1,
+  x2,
+  y2,
+  r2
+) {
 
-function update(dt) {
+  const dx =
+    x1 - x2;
 
-  if (
-    gameState !==
-    "playing"
-  ) {
+  const dy =
+    y1 - y2;
 
-    return;
-
-  }
-
-
-  frame++;
-
-
-  const slowMultiplier =
-    1 -
-    save.upgrades.slow * .035;
-
-
-  speed =
+  return (
+    dx * dx +
+    dy * dy <
     (
-      3 +
-      Math.min(
-        score * .035,
-        2.8
-      )
+      r1 + r2
     ) *
-    slowMultiplier;
-
-
-  /* BIRD */
-
-  bird.vy +=
-    .43 * dt;
-
-  bird.y +=
-    bird.vy * dt;
-
-
-  bird.rotation =
-    Math.max(
-      -.5,
-
-      Math.min(
-        .85,
-        bird.vy * .055
-      )
-    );
-
-
-  /* PIPES */
-
-  if (
-    frame % 104 === 0
-  ) {
-
-    createPipe();
-
-  }
-
-
-  for (
-    const pipe of pipes
-  ) {
-
-    pipe.x -=
-      speed * dt;
-
-
-    if (
-      !pipe.passed &&
-
-      pipe.x +
-        pipe.width <
-        bird.x
-    ) {
-
-      pipe.passed =
-        true;
-
-
-      score++;
-
-
-      save.missions.score25 =
-        Math.max(
-          save.missions.score25,
-
-          Math.min(
-            score,
-            25
-          )
-        );
-
-
-      save.missions.score50 =
-        Math.max(
-          save.missions.score50,
-
-          Math.min(
-            score,
-            50
-          )
-        );
-
-
-      createParticles(
-        bird.x,
-        bird.y,
-        "#ffffff",
-        12
-      );
-
-
-      playSound("score");
-
-
-      checkMissionRewards();
-
-    }
-
-
-    if (
-      pipeCollision(pipe)
-    ) {
-
-      if (
-        shieldActive
-      ) {
-
-        shieldActive =
-          false;
-
-        pipe.x =
-          -300;
-
-        bird.vy =
-          -7;
-
-
-        createParticles(
-          bird.x,
-          bird.y,
-          "#45eaff",
-          30
-        );
-
-
-        playSound(
-          "shield"
-        );
-
-      } else {
-
-        endGame();
-
-        return;
-
-      }
-
-    }
-
-  }
-
-
-  pipes =
-    pipes.filter(
-      pipe =>
-        pipe.x +
-          pipe.width >
-          -120
-    );
-
-
-  /* COINS */
-
-  const magnetRange =
-    42 +
-    save.upgrades.magnet *
-      38;
-
-
-  for (
-    const coin of coins
-  ) {
-
-    coin.x -=
-      speed * dt;
-
-
-    coin.spin +=
-      .12 * dt;
-
-
-    const dx =
-      bird.x -
-      coin.x;
-
-
-    const dy =
-      bird.y -
-      coin.y;
-
-
-    const distance =
-      Math.sqrt(
-        dx * dx +
-        dy * dy
-      );
-
-
-    if (
-      distance <
-      magnetRange
-    ) {
-
-      coin.x +=
-        dx *
-        .065 *
-        dt;
-
-
-      coin.y +=
-        dy *
-        .065 *
-        dt;
-
-    }
-
-
-    if (
-      !coin.collected &&
-
-      distance < 28
-    ) {
-
-      coin.collected =
-        true;
-
-
-      const amount =
-        1 +
-        save.upgrades.coin;
-
-
-      runCoins +=
-        amount;
-
-
-      save.coins +=
-        amount;
-
-
-      save.totalCoins +=
-        amount;
-
-
-      save.missions.coins50 =
-        Math.min(
-          50,
-
-          save.missions.coins50 +
-            amount
-        );
-
-
-      createParticles(
-        coin.x,
-        coin.y,
-        "#ffd84d",
-        16
-      );
-
-
-      playSound("coin");
-
-
-      checkMissionRewards();
-
-    }
-
-  }
-
-
-  coins =
-    coins.filter(
-      coin =>
-        !coin.collected &&
-        coin.x > -60
-    );
-
-
-  /* BOUNDARIES */
-
-  if (
-    bird.y < 18 ||
-    bird.y > H - 38
-  ) {
-
-    if (
-      shieldActive
-    ) {
-
-      shieldActive =
-        false;
-
-      bird.vy =
-        -7;
-
-
-      createParticles(
-        bird.x,
-        bird.y,
-        "#45eaff",
-        28
-      );
-
-
-      playSound(
-        "shield"
-      );
-
-    } else {
-
-      endGame();
-
-      return;
-
-    }
-
-  }
-
-
-  /* PARTICLES */
-
-  for (
-    const particle of particles
-  ) {
-
-    particle.x +=
-      particle.vx * dt;
-
-
-    particle.y +=
-      particle.vy * dt;
-
-
-    particle.vy +=
-      particle.gravity * dt;
-
-
-    particle.life -=
-      .035 * dt;
-
-  }
-
-
-  particles =
-    particles.filter(
-      particle =>
-        particle.life > 0
-    );
-
-
-  updateUI();
+    (
+      r1 + r2
+    )
+  );
 
 }
 
 
 /* ============================================================
-   MISSION PROGRESS
+   SCORE / COMBO
+   ============================================================ */
+
+function addScorePoint() {
+
+  score++;
+
+  save.totalScore++;
+
+  comboTimer = 180;
+
+  multiplier =
+    clamp(
+      multiplier + 1,
+      1,
+      20
+    );
+
+  maxCombo =
+    Math.max(
+      maxCombo,
+      multiplier
+    );
+
+  save.bestCombo =
+    Math.max(
+      save.bestCombo,
+      maxCombo
+    );
+
+  save.missions.score25 =
+    Math.max(
+      save.missions.score25,
+      Math.min(
+        score,
+        25
+      )
+    );
+
+  save.missions.score50 =
+    Math.max(
+      save.missions.score50,
+      Math.min(
+        score,
+        50
+      )
+    );
+
+  save.missions.combo10 =
+    Math.max(
+      save.missions.combo10,
+      Math.min(
+        multiplier,
+        10
+      )
+    );
+
+  if (
+    multiplier >= 10
+  ) {
+
+    unlockAchievement(
+      "combo10"
+    );
+
+  }
+
+  if (
+    score >= 25
+  ) {
+
+    unlockAchievement(
+      "score25"
+    );
+
+  }
+
+  if (
+    score >= 50
+  ) {
+
+    unlockAchievement(
+      "score50"
+    );
+
+  }
+
+  if (
+    score >= 100
+  ) {
+
+    unlockAchievement(
+      "score100"
+    );
+
+  }
+
+  if (
+    score >= 250
+  ) {
+
+    unlockAchievement(
+      "million"
+    );
+
+  }
+
+  checkMissionRewards();
+
+  createParticles(
+    bird.x,
+    bird.y,
+    "#ffffff",
+    12
+  );
+
+  playSound("score");
+
+}
+
+
+/* ============================================================
+   POWER-UP
+   ============================================================ */
+
+function collectPowerup(
+  power
+) {
+
+  switch (
+    power.type
+  ) {
+
+    case "shield":
+
+      shieldActive = true;
+
+      showToast(
+        "🛡️ SHIELD ACTIVE!"
+      );
+
+      break;
+
+    case "magnet":
+
+      magnetTimer =
+        480;
+
+      showToast(
+        "🧲 MAGNET ACTIVE!"
+      );
+
+      break;
+
+    case "slow":
+
+      slowTimer =
+        360;
+
+      showToast(
+        "⏱️ TIME WARP!"
+      );
+
+      break;
+
+    case "double":
+
+      coinDoubleTimer =
+        420;
+
+      showToast(
+        "🪙 2X COINS!"
+      );
+
+      break;
+
+    case "boost":
+
+      dashCooldown = 0;
+
+      dashActive = true;
+
+      dashTimer =
+        35;
+
+      showToast(
+        "💨 BOOST!"
+      );
+
+      break;
+
+  }
+
+  save.missions.powerups20 =
+    Math.min(
+      20,
+      save.missions.powerups20 + 1
+    );
+
+  unlockAchievement(
+    "powerup"
+  );
+
+  checkMissionRewards();
+
+  createParticles(
+    bird.x,
+    bird.y,
+    "#5ffaff",
+    30,
+    1.5
+  );
+
+  createShockwave(
+    bird.x,
+    bird.y,
+    "#5ffaff"
+  );
+
+  playSound("power");
+
+  queueSave();
+
+}
+
+
+/* ============================================================
+   GEM
+   ============================================================ */
+
+function collectGem(
+  gem
+) {
+
+  const amount =
+    1 +
+    Math.floor(
+      save.upgrades.luck / 3
+    );
+
+  runGems += amount;
+
+  save.gems += amount;
+
+  save.totalGems += amount;
+
+  save.missions.gems10 =
+    Math.min(
+      10,
+      save.missions.gems10 +
+      amount
+    );
+
+  unlockAchievement(
+    "gems25"
+  );
+
+  createParticles(
+    gem.x,
+    gem.y,
+    "#65f6ff",
+    25,
+    1.4
+  );
+
+  createShockwave(
+    gem.x,
+    gem.y,
+    "#65f6ff"
+  );
+
+  playSound("gem");
+
+  checkMissionRewards();
+
+  queueSave();
+
+}
+
+
+/* ============================================================
+   COIN
+   ============================================================ */
+
+function collectCoin(
+  coin
+) {
+
+  const base =
+    1 +
+    save.upgrades.coin;
+
+  const amount =
+    coinDoubleTimer > 0
+      ? base * 2
+      : base;
+
+  runCoins += amount;
+
+  save.coins += amount;
+
+  save.totalCoins += amount;
+
+  save.missions.coins50 =
+    Math.min(
+      50,
+      save.missions.coins50 +
+      amount
+    );
+
+  if (
+    save.totalCoins >= 100
+  ) {
+
+    unlockAchievement(
+      "coins100"
+    );
+
+  }
+
+  createParticles(
+    coin.x,
+    coin.y,
+    "#ffd84d",
+    16
+  );
+
+  playSound("coin");
+
+  checkMissionRewards();
+
+  queueSave();
+
+}
+
+
+/* ============================================================
+   CRATES
+   ============================================================ */
+
+function spawnCrate() {
+
+  powerups.push({
+
+    x:
+      W + 120,
+
+    y:
+      random(120, H - 130),
+
+    type:
+      "crate",
+
+    spin:
+      0,
+
+    collected:
+      false
+
+  });
+
+}
+
+
+function openCrate() {
+
+  const roll =
+    Math.random();
+
+  if (
+    roll < .45
+  ) {
+
+    const amount =
+      10 +
+      Math.floor(
+        Math.random() * 25
+      );
+
+    save.coins += amount;
+    runCoins += amount;
+
+    showToast(
+      `🎁 +${amount} COINS`
+    );
+
+  }
+
+  else if (
+    roll < .7
+  ) {
+
+    save.gems += 1;
+    runGems += 1;
+
+    showToast(
+      "🎁 +1 GEM"
+    );
+
+  }
+
+  else if (
+    roll < .9
+  ) {
+
+    shieldActive = true;
+
+    showToast(
+      "🎁 SHIELD!"
+    );
+
+  }
+
+  else {
+
+    coinDoubleTimer =
+      600;
+
+    showToast(
+      "🎁 2X COINS!"
+    );
+
+  }
+
+  createParticles(
+    bird.x,
+    bird.y,
+    "#ffd84d",
+    40,
+    1.6
+  );
+
+  playSound("crate");
+
+  queueSave();
+
+}
+
+
+/* ============================================================
+   MISSION REWARDS
    ============================================================ */
 
 function updateMissionProgress() {
@@ -2399,66 +3634,12 @@ function updateMissionProgress() {
 }
 
 
-/* ============================================================
-   MISSION REWARDS
-   ============================================================ */
-
 function checkMissionRewards() {
 
   updateMissionProgress();
 
-
-  const missions = [
-
-    {
-      key:
-        "score25",
-
-      max:
-        25,
-
-      reward:
-        150
-    },
-
-    {
-      key:
-        "coins50",
-
-      max:
-        50,
-
-      reward:
-        250
-    },
-
-    {
-      key:
-        "games10",
-
-      max:
-        10,
-
-      reward:
-        300
-    },
-
-    {
-      key:
-        "score50",
-
-      max:
-        50,
-
-      reward:
-        500
-    }
-
-  ];
-
-
   for (
-    const mission of missions
+    const mission of MISSIONS
   ) {
 
     if (
@@ -2477,23 +3658,72 @@ function checkMissionRewards() {
       save.coins +=
         mission.reward;
 
-
       save.missionClaimed[
         mission.key
-      ] =
-        true;
+      ] = true;
 
-
-      playSound(
-        "mission"
+      showToast(
+        `🎯 ${mission.name} +${mission.reward} 🪙`
       );
+
+      playSound("mission");
 
     }
 
   }
 
+  queueSave();
 
-  saveGame();
+}
+
+
+/* ============================================================
+   ACHIEVEMENTS
+   ============================================================ */
+
+function unlockAchievement(
+  key
+) {
+
+  if (
+    save.achievements[key]
+  ) {
+
+    return;
+
+  }
+
+  const achievement =
+    ACHIEVEMENTS.find(
+      a => a.key === key
+    );
+
+  if (!achievement) {
+
+    return;
+
+  }
+
+  save.achievements[key] =
+    Date.now();
+
+  showToast(
+    `🏆 ${achievement.name}!`
+  );
+
+  createParticles(
+    bird?.x || W / 2,
+    bird?.y || H / 2,
+    "#ffd84d",
+    35,
+    1.4
+  );
+
+  playSound(
+    "achievement"
+  );
+
+  queueSave();
 
 }
 
@@ -2513,41 +3743,99 @@ function endGame() {
 
   }
 
+  /*
+     Revive is handled as an actual gameplay mechanic.
+  */
+
+  if (
+    reviveCharges > 0 &&
+    !hasRevived
+  ) {
+
+    hasRevived = true;
+
+    reviveCharges--;
+
+    gameState =
+      "playing";
+
+    shieldActive = true;
+
+    bird.y =
+      H / 2;
+
+    bird.vy =
+      -8;
+
+    dashActive = true;
+
+    dashTimer =
+      50;
+
+    screenShake =
+      18;
+
+    createShockwave(
+      bird.x,
+      bird.y,
+      "#ff66d9"
+    );
+
+    createParticles(
+      bird.x,
+      bird.y,
+      "#ff66d9",
+      70,
+      2
+    );
+
+    playSound("revive");
+
+    showToast(
+      "❤️ REVIVED!"
+    );
+
+    return;
+
+  }
 
   gameState =
     "gameover";
-
 
   document.getElementById(
     "pauseButton"
   ).style.display =
     "none";
 
-
   playSound("hit");
-
 
   const skin =
     SKINS[
       save.skins.equipped
     ];
 
-
   createParticles(
     bird.x,
     bird.y,
     skin.color,
-    40
+    55,
+    1.8
   );
 
+  createShockwave(
+    bird.x,
+    bird.y,
+    skin.color
+  );
+
+  screenShake =
+    22;
 
   const oldBest =
     save.highScore;
 
-
   const isNewBest =
     score > oldBest;
-
 
   if (
     isNewBest
@@ -2558,52 +3846,52 @@ function endGame() {
 
   }
 
-
   save.missions.score25 =
     Math.max(
       save.missions.score25,
-
       Math.min(
         score,
         25
       )
     );
 
-
   save.missions.score50 =
     Math.max(
       save.missions.score50,
-
       Math.min(
         score,
         50
       )
     );
 
-
   checkMissionRewards();
 
-
   saveGame();
-
 
   document.getElementById(
     "finalScore"
   ).textContent =
     score;
 
-
   document.getElementById(
     "finalCoins"
   ).textContent =
     runCoins;
 
+  document.getElementById(
+    "finalGems"
+  ).textContent =
+    runGems;
 
   document.getElementById(
     "finalBest"
   ).textContent =
     save.highScore;
 
+  document.getElementById(
+    "finalCombo"
+  ).textContent =
+    "x" + maxCombo;
 
   document.getElementById(
     "newBest"
@@ -2612,11 +3900,932 @@ function endGame() {
       ? "🏆 NEW HIGH SCORE!"
       : "";
 
+  const reviveButton =
+    document.getElementById(
+      "reviveBtn"
+    );
+
+  reviveButton.disabled =
+    true;
+
+  reviveButton.textContent =
+    hasRevived
+      ? "❤️ USED"
+      : "❤️ REVIVE";
 
   showPanel(
     "gameOverPanel"
   );
 
+  updateUI();
+
+}
+
+
+/* ============================================================
+   UPDATE
+   ============================================================ */
+
+function update(
+  dt
+) {
+
+  if (
+    gameState !==
+    "playing"
+  ) {
+
+    return;
+
+  }
+
+  frame++;
+
+  /*
+     Timers.
+  */
+
+  if (
+    comboTimer > 0
+  ) {
+
+    comboTimer -= dt;
+
+  }
+
+  else {
+
+    multiplier = 1;
+
+  }
+
+  if (
+    slowTimer > 0
+  ) {
+
+    slowTimer -= dt;
+
+  }
+
+  if (
+    magnetTimer > 0
+  ) {
+
+    magnetTimer -= dt;
+
+  }
+
+  if (
+    coinDoubleTimer > 0
+  ) {
+
+    coinDoubleTimer -= dt;
+
+  }
+
+  if (
+    dashCooldown > 0
+  ) {
+
+    dashCooldown -= dt;
+
+  }
+
+  if (
+    dashTimer > 0
+  ) {
+
+    dashTimer -= dt;
+
+  }
+
+  else {
+
+    dashActive = false;
+
+  }
+
+  /*
+     Difficulty.
+  */
+
+  const slowMultiplier =
+    slowTimer > 0
+      ? .55
+      : (
+          1 -
+          save.upgrades.slow *
+          .035
+        );
+
+  speed =
+    (
+      3 +
+      Math.min(
+        score * .035,
+        3.5
+      )
+    ) *
+    slowMultiplier;
+
+  /*
+     Zone changes.
+  */
+
+  zone =
+    Math.floor(
+      score / 25
+    );
+
+  /*
+     Bird physics.
+  */
+
+  bird.vy +=
+    (
+      dashActive
+        ? .22
+        : .43
+    ) *
+    dt;
+
+  bird.y +=
+    bird.vy *
+    dt;
+
+  bird.rotation =
+    Math.max(
+      -.55,
+      Math.min(
+        .9,
+        bird.vy * .055
+      )
+    );
+
+  bird.pulse *=
+    Math.pow(
+      .9,
+      dt
+    );
+
+  /*
+     Pipes.
+  */
+
+  if (
+    frame % 102 === 0
+  ) {
+
+    createPipe();
+
+  }
+
+  for (
+    const pipe of pipes
+  ) {
+
+    pipe.x -=
+      speed * dt;
+
+    if (
+      !pipe.passed &&
+
+      pipe.x +
+      pipe.width <
+      bird.x
+    ) {
+
+      pipe.passed =
+        true;
+
+      addScorePoint();
+
+    }
+
+    if (
+      pipeCollision(pipe)
+    ) {
+
+      if (
+        dashActive
+      ) {
+
+        pipe.x =
+          -500;
+
+        createParticles(
+          bird.x,
+          bird.y,
+          "#59f3ff",
+          25,
+          1.5
+        );
+
+        score +=
+          multiplier;
+
+        continue;
+
+      }
+
+      if (
+        shieldActive
+      ) {
+
+        shieldActive =
+          false;
+
+        pipe.x =
+          -500;
+
+        bird.vy =
+          -7;
+
+        createShockwave(
+          bird.x,
+          bird.y,
+          "#45eaff"
+        );
+
+        createParticles(
+          bird.x,
+          bird.y,
+          "#45eaff",
+          35,
+          1.4
+        );
+
+        playSound(
+          "shield"
+        );
+
+      }
+
+      else {
+
+        endGame();
+
+        return;
+
+      }
+
+    }
+
+  }
+
+  pipes =
+    pipes.filter(
+      pipe =>
+        pipe.x +
+        pipe.width >
+        -130
+    );
+
+  /*
+     Coins.
+  */
+
+  const magnetRange =
+    (
+      magnetTimer > 0
+        ? 140
+        : 42 +
+          save.upgrades.magnet *
+          38
+    );
+
+  for (
+    const coin of coins
+  ) {
+
+    coin.x -=
+      speed * dt;
+
+    coin.spin +=
+      .12 * dt;
+
+    const dx =
+      bird.x -
+      coin.x;
+
+    const dy =
+      bird.y -
+      coin.y;
+
+    const distance =
+      Math.sqrt(
+        dx * dx +
+        dy * dy
+      );
+
+    if (
+      distance <
+      magnetRange
+    ) {
+
+      coin.x +=
+        dx *
+        .065 *
+        dt;
+
+      coin.y +=
+        dy *
+        .065 *
+        dt;
+
+    }
+
+    if (
+      !coin.collected &&
+      distance < 28
+    ) {
+
+      coin.collected =
+        true;
+
+      collectCoin(
+        coin
+      );
+
+    }
+
+  }
+
+  coins =
+    coins.filter(
+      coin =>
+        !coin.collected &&
+        coin.x > -60
+    );
+
+  /*
+     Gems.
+  */
+
+  for (
+    const gem of gems
+  ) {
+
+    gem.x -=
+      speed * dt;
+
+    gem.pulse +=
+      .08 * dt;
+
+    if (
+      !gem.collected &&
+      circleCollision(
+        bird.x,
+        bird.y,
+        18,
+        gem.x,
+        gem.y,
+        15
+      )
+    ) {
+
+      gem.collected =
+        true;
+
+      collectGem(
+        gem
+      );
+
+    }
+
+  }
+
+  gems =
+    gems.filter(
+      gem =>
+        !gem.collected &&
+        gem.x > -60
+    );
+
+  /*
+     Powerups / crates.
+  */
+
+  for (
+    const power of powerups
+  ) {
+
+    power.x -=
+      speed * dt;
+
+    power.spin +=
+      .08 * dt;
+
+    if (
+      !power.collected &&
+      circleCollision(
+        bird.x,
+        bird.y,
+        18,
+        power.x,
+        power.y,
+        17
+      )
+    ) {
+
+      power.collected =
+        true;
+
+      if (
+        power.type ===
+        "crate"
+      ) {
+
+        openCrate();
+
+      }
+
+      else {
+
+        collectPowerup(
+          power
+        );
+
+      }
+
+    }
+
+  }
+
+  powerups =
+    powerups.filter(
+      power =>
+        !power.collected &&
+        power.x > -80
+    );
+
+  /*
+     Meteor spawning.
+  */
+
+  if (
+    frame % 300 === 0 &&
+    score >= 10
+  ) {
+
+    spawnMeteor();
+
+  }
+
+  /*
+     UFO spawning.
+  */
+
+  if (
+    frame % 450 === 0 &&
+    score >= 20
+  ) {
+
+    spawnUFO();
+
+  }
+
+  /*
+     Mystery crates.
+  */
+
+  if (
+    frame % 900 === 0 &&
+    score >= 15
+  ) {
+
+    spawnCrate();
+
+  }
+
+  /*
+     Meteors.
+  */
+
+  for (
+    const meteor of meteors
+  ) {
+
+    meteor.x -=
+      (
+        speed +
+        meteor.vx
+      ) *
+      dt;
+
+    meteor.rotation +=
+      meteor.vr *
+      dt;
+
+    if (
+      circleCollision(
+        bird.x,
+        bird.y,
+        17,
+        meteor.x,
+        meteor.y,
+        meteor.radius
+      )
+    ) {
+
+      if (
+        dashActive
+      ) {
+
+        meteor.x =
+          -200;
+
+        createParticles(
+          meteor.x,
+          meteor.y,
+          "#ff9b54",
+          25
+        );
+
+      }
+
+      else if (
+        shieldActive
+      ) {
+
+        shieldActive =
+          false;
+
+        meteor.x =
+          -200;
+
+        createParticles(
+          bird.x,
+          bird.y,
+          "#45eaff",
+          30
+        );
+
+        playSound(
+          "shield"
+        );
+
+      }
+
+      else {
+
+        endGame();
+
+        return;
+
+      }
+
+    }
+
+    if (
+      !meteor.counted &&
+      meteor.x <
+      bird.x
+    ) {
+
+      meteor.counted =
+        true;
+
+      save.missions.meteors10 =
+        Math.min(
+          10,
+          save.missions.meteors10 + 1
+        );
+
+      checkMissionRewards();
+
+    }
+
+  }
+
+  meteors =
+    meteors.filter(
+      meteor =>
+        meteor.x > -100
+    );
+
+  /*
+     UFOs.
+  */
+
+  for (
+    const ufo of ufos
+  ) {
+
+    ufo.x -=
+      ufo.speed *
+      dt;
+
+    ufo.t +=
+      .07 *
+      dt;
+
+    ufo.y =
+      ufo.baseY +
+      Math.sin(
+        ufo.t
+      ) *
+      35;
+
+    if (
+      circleCollision(
+        bird.x,
+        bird.y,
+        17,
+        ufo.x,
+        ufo.y,
+        20
+      )
+    ) {
+
+      if (
+        dashActive
+      ) {
+
+        ufo.x =
+          -200;
+
+        score +=
+          2;
+
+        createParticles(
+          ufo.x,
+          ufo.y,
+          "#ff62e6",
+          30
+        );
+
+      }
+
+      else if (
+        shieldActive
+      ) {
+
+        shieldActive =
+          false;
+
+        ufo.x =
+          -200;
+
+        createParticles(
+          bird.x,
+          bird.y,
+          "#45eaff",
+          30
+        );
+
+        playSound(
+          "shield"
+        );
+
+      }
+
+      else {
+
+        endGame();
+
+        return;
+
+      }
+
+    }
+
+  }
+
+  ufos =
+    ufos.filter(
+      ufo =>
+        ufo.x > -100
+    );
+
+  /*
+     Boss.
+  */
+
+  if (
+    score > 0 &&
+    score % 50 === 0 &&
+    frame % 20 === 0 &&
+    !boss
+  ) {
+
+    spawnBoss();
+
+  }
+
+  if (
+    boss &&
+    boss.active
+  ) {
+
+    boss.t +=
+      .025 *
+      dt;
+
+    boss.x =
+      Math.max(
+        W - 100,
+        boss.x -
+        speed * .4 * dt
+      );
+
+    boss.y =
+      H / 2 +
+      Math.sin(
+        boss.t
+      ) *
+      130;
+
+    if (
+      circleCollision(
+        bird.x,
+        bird.y,
+        18,
+        boss.x,
+        boss.y,
+        45
+      )
+    ) {
+
+      if (
+        dashActive
+      ) {
+
+        boss.hp--;
+
+        dashActive =
+          false;
+
+        createParticles(
+          boss.x,
+          boss.y,
+          "#ff62e6",
+          40
+        );
+
+        if (
+          boss.hp <= 0
+        ) {
+
+          boss.active =
+            false;
+
+          score += 10;
+
+          unlockAchievement(
+            "boss"
+          );
+
+          showToast(
+            "👾 BOSS DESTROYED! +10"
+          );
+
+        }
+
+      }
+
+      else if (
+        shieldActive
+      ) {
+
+        shieldActive =
+          false;
+
+        createParticles(
+          bird.x,
+          bird.y,
+          "#45eaff",
+          30
+        );
+
+      }
+
+      else {
+
+        endGame();
+
+        return;
+
+      }
+
+    }
+
+  }
+
+  /*
+     Boundaries.
+  */
+
+  if (
+    bird.y < 18 ||
+    bird.y > H - 45
+  ) {
+
+    if (
+      shieldActive
+    ) {
+
+      shieldActive =
+        false;
+
+      bird.y =
+        clamp(
+          bird.y,
+          25,
+          H - 55
+        );
+
+      bird.vy =
+        -7;
+
+      createParticles(
+        bird.x,
+        bird.y,
+        "#45eaff",
+        30
+      );
+
+      playSound(
+        "shield"
+      );
+
+    }
+
+    else {
+
+      endGame();
+
+      return;
+
+    }
+
+  }
+
+  /*
+     Particles.
+  */
+
+  for (
+    const particle of particles
+  ) {
+
+    particle.x +=
+      particle.vx *
+      dt;
+
+    particle.y +=
+      particle.vy *
+      dt;
+
+    particle.vy +=
+      particle.gravity *
+      dt;
+
+    particle.life -=
+      .035 *
+      dt;
+
+  }
+
+  particles =
+    particles.filter(
+      particle =>
+        particle.life > 0
+    );
+
+  /*
+     Shockwaves.
+  */
+
+  for (
+    const wave of shockwaves
+  ) {
+
+    wave.radius +=
+      4 *
+      dt;
+
+    wave.life -=
+      .035 *
+      dt;
+
+  }
+
+  shockwaves =
+    shockwaves.filter(
+      wave =>
+        wave.life > 0
+    );
+
+  /*
+     Screen shake.
+  */
+
+  screenShake *=
+    Math.pow(
+      .84,
+      dt
+    );
 
   updateUI();
 
@@ -2629,11 +4838,29 @@ function endGame() {
 
 function drawBackground() {
 
-  const phase =
-    Math.floor(
-      score / 15
-    ) % 2;
+  const zoneIndex =
+    zone % 6;
 
+  const palettes = [
+
+    ["#061333","#164f78"],
+
+    ["#170b3d","#5a1b70"],
+
+    ["#031c2e","#075d71"],
+
+    ["#19051e","#710d48"],
+
+    ["#08173c","#24318a"],
+
+    ["#14051f","#4b0a72"]
+
+  ];
+
+  const palette =
+    palettes[
+      zoneIndex
+    ];
 
   const gradient =
     ctx.createLinearGradient(
@@ -2643,39 +4870,18 @@ function drawBackground() {
       H
     );
 
+  gradient.addColorStop(
+    0,
+    palette[0]
+  );
 
-  if (
-    phase === 0
-  ) {
-
-    gradient.addColorStop(
-      0,
-      "#071332"
-    );
-
-    gradient.addColorStop(
-      1,
-      "#14527a"
-    );
-
-  } else {
-
-    gradient.addColorStop(
-      0,
-      "#170b36"
-    );
-
-    gradient.addColorStop(
-      1,
-      "#571a69"
-    );
-
-  }
-
+  gradient.addColorStop(
+    1,
+    palette[1]
+  );
 
   ctx.fillStyle =
     gradient;
-
 
   ctx.fillRect(
     0,
@@ -2684,14 +4890,54 @@ function drawBackground() {
     H
   );
 
+  /*
+     Nebula.
+  */
+
+  const nebula =
+    ctx.createRadialGradient(
+      350,
+      150,
+      10,
+      350,
+      150,
+      180
+    );
+
+  nebula.addColorStop(
+    0,
+    "rgba(150,120,255,.22)"
+  );
+
+  nebula.addColorStop(
+    1,
+    "rgba(0,0,0,0)"
+  );
+
+  ctx.fillStyle =
+    nebula;
+
+  ctx.fillRect(
+    0,
+    0,
+    W,
+    H
+  );
+
+  /*
+     Stars.
+  */
 
   for (
     const star of stars
   ) {
 
     star.x -=
-      star.speed;
-
+      star.speed *
+      (
+        1 +
+        zone * .08
+      );
 
     if (
       star.x < 0
@@ -2700,19 +4946,19 @@ function drawBackground() {
       star.x =
         W;
 
-    }
+      star.y =
+        Math.random() *
+        H;
 
+    }
 
     ctx.globalAlpha =
       star.alpha;
 
-
     ctx.fillStyle =
       "white";
 
-
     ctx.beginPath();
-
 
     ctx.arc(
       star.x,
@@ -2722,11 +4968,30 @@ function drawBackground() {
       Math.PI * 2
     );
 
-
     ctx.fill();
 
   }
 
+  /*
+     Shooting stars.
+  */
+
+  if (
+    frame % 220 === 0
+  ) {
+
+    createParticles(
+      random(0,W),
+      random(0,H * .65),
+      "#ffffff",
+      2
+    );
+
+  }
+
+  /*
+     Clouds / space fog.
+  */
 
   for (
     const cloud of clouds
@@ -2735,11 +5000,10 @@ function drawBackground() {
     cloud.x -=
       cloud.speed;
 
-
     if (
       cloud.x +
-        cloud.width <
-        0
+      cloud.width <
+      0
     ) {
 
       cloud.x =
@@ -2748,17 +5012,13 @@ function drawBackground() {
 
     }
 
-
     ctx.globalAlpha =
       cloud.alpha;
 
-
     ctx.fillStyle =
-      "#b9c9ff";
-
+      "#c8d5ff";
 
     ctx.beginPath();
-
 
     ctx.ellipse(
       cloud.x,
@@ -2770,50 +5030,50 @@ function drawBackground() {
       Math.PI * 2
     );
 
-
     ctx.fill();
 
   }
 
-
   ctx.globalAlpha =
     1;
 
+  /*
+     Planet.
+  */
+
+  const planetX =
+    350;
+
+  const planetY =
+    125;
 
   ctx.fillStyle =
     "rgba(255,255,255,.09)";
 
-
   ctx.beginPath();
 
-
   ctx.arc(
-    350,
-    130,
-    78,
+    planetX,
+    planetY,
+    80,
     0,
     Math.PI * 2
   );
-
 
   ctx.fill();
 
-
   ctx.fillStyle =
-    "rgba(255,255,255,.07)";
-
+    "rgba(255,255,255,.055)";
 
   ctx.beginPath();
 
-
   ctx.arc(
-    340,
-    120,
-    55,
+    planetX - 12,
+    planetY - 10,
+    57,
     0,
     Math.PI * 2
   );
-
 
   ctx.fill();
 
@@ -2821,7 +5081,7 @@ function drawBackground() {
 
 
 /* ============================================================
-   PIPE DRAW
+   PIPES
    ============================================================ */
 
 function drawPipes() {
@@ -2835,32 +5095,27 @@ function drawPipes() {
         pipe.x,
         0,
         pipe.x +
-          pipe.width,
+        pipe.width,
         0
       );
-
 
     gradient.addColorStop(
       0,
       "#08704d"
     );
 
-
     gradient.addColorStop(
       .45,
       "#42d88f"
     );
-
 
     gradient.addColorStop(
       1,
       "#0b8058"
     );
 
-
     ctx.fillStyle =
       gradient;
-
 
     ctx.fillRect(
       pipe.x,
@@ -2869,20 +5124,17 @@ function drawPipes() {
       pipe.top
     );
 
-
     ctx.fillRect(
       pipe.x,
       pipe.bottom,
       pipe.width,
       H -
-        pipe.bottom
+      pipe.bottom
     );
-
 
     ctx.fillStyle =
       "rgba(255,255,255,.14)";
 
-
     ctx.fillRect(
       pipe.x + 8,
       0,
@@ -2890,19 +5142,16 @@ function drawPipes() {
       pipe.top
     );
 
-
     ctx.fillRect(
       pipe.x + 8,
       pipe.bottom,
       8,
       H -
-        pipe.bottom
+      pipe.bottom
     );
-
 
     ctx.fillStyle =
       "#5ae6a1";
-
 
     ctx.fillRect(
       pipe.x - 5,
@@ -2911,7 +5160,6 @@ function drawPipes() {
       22
     );
 
-
     ctx.fillRect(
       pipe.x - 5,
       pipe.bottom,
@@ -2919,10 +5167,8 @@ function drawPipes() {
       22
     );
 
-
     ctx.fillStyle =
       "rgba(0,0,0,.13)";
-
 
     ctx.fillRect(
       pipe.x - 5,
@@ -2930,7 +5176,6 @@ function drawPipes() {
       pipe.width + 10,
       5
     );
-
 
     ctx.fillRect(
       pipe.x - 5,
@@ -2945,7 +5190,7 @@ function drawPipes() {
 
 
 /* ============================================================
-   COIN DRAW
+   COINS
    ============================================================ */
 
 function drawCoins() {
@@ -2956,50 +5201,41 @@ function drawCoins() {
 
     ctx.save();
 
-
     ctx.translate(
       coin.x,
       coin.y
     );
-
 
     const scale =
       Math.abs(
         Math.cos(
           coin.spin
         )
-      ) * .38 +
+      ) *
+      .38 +
       .62;
-
 
     ctx.scale(
       scale,
       1
     );
 
-
     ctx.shadowColor =
       "#ffd84d";
-
 
     ctx.shadowBlur =
       12;
 
-
     ctx.fillStyle =
       "#ffd84d";
-
 
     ctx.strokeStyle =
       "#fff3a3";
 
-
     ctx.lineWidth =
       3;
 
-
     ctx.beginPath();
-
 
     ctx.arc(
       0,
@@ -3009,38 +5245,29 @@ function drawCoins() {
       Math.PI * 2
     );
 
-
     ctx.fill();
-
     ctx.stroke();
-
 
     ctx.shadowBlur =
       0;
 
-
     ctx.fillStyle =
       "#a46c00";
-
 
     ctx.font =
       "bold 13px Arial";
 
-
     ctx.textAlign =
       "center";
 
-
     ctx.textBaseline =
       "middle";
-
 
     ctx.fillText(
       "$",
       0,
       1
     );
-
 
     ctx.restore();
 
@@ -3050,7 +5277,551 @@ function drawCoins() {
 
 
 /* ============================================================
-   BIRD DRAW
+   GEMS
+   ============================================================ */
+
+function drawGems() {
+
+  for (
+    const gem of gems
+  ) {
+
+    ctx.save();
+
+    ctx.translate(
+      gem.x,
+      gem.y
+    );
+
+    const pulse =
+      1 +
+      Math.sin(
+        gem.pulse
+      ) *
+      .08;
+
+    ctx.scale(
+      pulse,
+      pulse
+    );
+
+    ctx.shadowColor =
+      "#54f5ff";
+
+    ctx.shadowBlur =
+      20;
+
+    ctx.fillStyle =
+      "#58efff";
+
+    ctx.strokeStyle =
+      "#d5ffff";
+
+    ctx.lineWidth =
+      2;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      0,
+      -15
+    );
+
+    ctx.lineTo(
+      12,
+      -4
+    );
+
+    ctx.lineTo(
+      7,
+      13
+    );
+
+    ctx.lineTo(
+      -7,
+      13
+    );
+
+    ctx.lineTo(
+      -12,
+      -4
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.restore();
+
+  }
+
+}
+
+
+/* ============================================================
+   POWERUPS
+   ============================================================ */
+
+function drawPowerups() {
+
+  for (
+    const power of powerups
+  ) {
+
+    ctx.save();
+
+    ctx.translate(
+      power.x,
+      power.y
+    );
+
+    ctx.rotate(
+      power.spin
+    );
+
+    ctx.shadowBlur =
+      18;
+
+    let color =
+      "#58efff";
+
+    let icon =
+      "⚡";
+
+    if (
+      power.type ===
+      "shield"
+    ) {
+
+      color =
+        "#54eaff";
+
+      icon =
+        "🛡️";
+
+    }
+
+    else if (
+      power.type ===
+      "magnet"
+    ) {
+
+      color =
+        "#ff4da6";
+
+      icon =
+        "🧲";
+
+    }
+
+    else if (
+      power.type ===
+      "slow"
+    ) {
+
+      color =
+        "#9d8cff";
+
+      icon =
+        "⏱️";
+
+    }
+
+    else if (
+      power.type ===
+      "double"
+    ) {
+
+      color =
+        "#ffd84d";
+
+      icon =
+        "2X";
+
+    }
+
+    else if (
+      power.type ===
+      "boost"
+    ) {
+
+      color =
+        "#ff704d";
+
+      icon =
+        "💨";
+
+    }
+
+    else if (
+      power.type ===
+      "crate"
+    ) {
+
+      color =
+        "#ffd84d";
+
+      icon =
+        "🎁";
+
+    }
+
+    ctx.shadowColor =
+      color;
+
+    ctx.fillStyle =
+      color;
+
+    ctx.beginPath();
+
+    ctx.roundRect(
+      -18,
+      -18,
+      36,
+      36,
+      9
+    );
+
+    ctx.fill();
+
+    ctx.shadowBlur =
+      0;
+
+    ctx.fillStyle =
+      "#111522";
+
+    ctx.font =
+      "bold 16px Arial";
+
+    ctx.textAlign =
+      "center";
+
+    ctx.textBaseline =
+      "middle";
+
+    ctx.fillText(
+      icon,
+      0,
+      1
+    );
+
+    ctx.restore();
+
+  }
+
+}
+
+
+/* ============================================================
+   METEORS
+   ============================================================ */
+
+function drawMeteors() {
+
+  for (
+    const meteor of meteors
+  ) {
+
+    ctx.save();
+
+    ctx.translate(
+      meteor.x,
+      meteor.y
+    );
+
+    ctx.rotate(
+      meteor.rotation
+    );
+
+    ctx.shadowColor =
+      "#ff714d";
+
+    ctx.shadowBlur =
+      15;
+
+    ctx.fillStyle =
+      "#9c593f";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      0,
+      0,
+      meteor.radius,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+
+    ctx.shadowBlur =
+      0;
+
+    ctx.fillStyle =
+      "rgba(0,0,0,.25)";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      -5,
+      -3,
+      meteor.radius * .25,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+
+    ctx.beginPath();
+
+    ctx.arc(
+      6,
+      5,
+      meteor.radius * .18,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+
+    ctx.restore();
+
+  }
+
+}
+
+
+/* ============================================================
+   UFOS
+   ============================================================ */
+
+function drawUFOs() {
+
+  for (
+    const ufo of ufos
+  ) {
+
+    ctx.save();
+
+    ctx.translate(
+      ufo.x,
+      ufo.y
+    );
+
+    ctx.shadowColor =
+      "#ff4de1";
+
+    ctx.shadowBlur =
+      16;
+
+    ctx.fillStyle =
+      "#a95cff";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+      0,
+      4,
+      25,
+      10,
+      0,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+
+    ctx.fillStyle =
+      "#7cddff";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      0,
+      -4,
+      12,
+      Math.PI,
+      0
+    );
+
+    ctx.fill();
+
+    ctx.shadowBlur =
+      0;
+
+    ctx.fillStyle =
+      "#ffe96b";
+
+    for (
+      let i = -2;
+      i <= 2;
+      i++
+    ) {
+
+      ctx.beginPath();
+
+      ctx.arc(
+        i * 8,
+        5,
+        2,
+        0,
+        Math.PI * 2
+      );
+
+      ctx.fill();
+
+    }
+
+    ctx.restore();
+
+  }
+
+}
+
+
+/* ============================================================
+   BOSS
+   ============================================================ */
+
+function drawBoss() {
+
+  if (
+    !boss ||
+    !boss.active
+  ) {
+
+    return;
+
+  }
+
+  ctx.save();
+
+  ctx.translate(
+    boss.x,
+    boss.y
+  );
+
+  ctx.shadowColor =
+    "#ff4de1";
+
+  ctx.shadowBlur =
+    30;
+
+  ctx.fillStyle =
+    "#5f237d";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    0,
+    0,
+    45,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+  ctx.shadowBlur =
+    0;
+
+  ctx.fillStyle =
+    "#ff4de1";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    0,
+    0,
+    24,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+  ctx.fillStyle =
+    "#fff";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    -10,
+    -8,
+    6,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.arc(
+    10,
+    -8,
+    6,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+  ctx.fillStyle =
+    "#111";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    -10,
+    -8,
+    3,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.arc(
+    10,
+    -8,
+    3,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+  /*
+     Boss health.
+  */
+
+  ctx.fillStyle =
+    "rgba(0,0,0,.5)";
+
+  ctx.fillRect(
+    -45,
+    -62,
+    90,
+    7
+  );
+
+  ctx.fillStyle =
+    "#ff4de1";
+
+  ctx.fillRect(
+    -45,
+    -62,
+    90 *
+    (
+      boss.hp /
+      boss.maxHp
+    ),
+    7
+  );
+
+  ctx.restore();
+
+}
+
+
+/* ============================================================
+   BIRD
    ============================================================ */
 
 function drawBird() {
@@ -3061,49 +5832,43 @@ function drawBird() {
 
   }
 
-
   const skin =
     SKINS[
       save.skins.equipped
     ];
 
-
   ctx.save();
-
 
   ctx.translate(
     bird.x,
     bird.y
   );
 
-
   ctx.rotate(
     bird.rotation
   );
 
+  /*
+     Shield.
+  */
 
   if (
     shieldActive
   ) {
 
     ctx.strokeStyle =
-      "rgba(67,231,255,.85)";
-
+      "rgba(67,231,255,.9)";
 
     ctx.lineWidth =
       4;
 
-
     ctx.shadowColor =
       "#42eaff";
 
-
     ctx.shadowBlur =
-      18;
-
+      20;
 
     ctx.beginPath();
-
 
     ctx.arc(
       0,
@@ -3113,30 +5878,54 @@ function drawBird() {
       Math.PI * 2
     );
 
-
     ctx.stroke();
-
-
-    ctx.shadowBlur =
-      0;
 
   }
 
+  /*
+     Dash glow.
+  */
+
+  if (
+    dashActive
+  ) {
+
+    ctx.strokeStyle =
+      "#ff8bff";
+
+    ctx.lineWidth =
+      4;
+
+    ctx.shadowColor =
+      "#ff55ff";
+
+    ctx.shadowBlur =
+      25;
+
+    ctx.beginPath();
+
+    ctx.arc(
+      0,
+      0,
+      34,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.stroke();
+
+  }
 
   ctx.shadowColor =
     skin.color;
 
-
   ctx.shadowBlur =
     18;
-
 
   ctx.fillStyle =
     skin.color;
 
-
   ctx.beginPath();
-
 
   ctx.arc(
     0,
@@ -3146,20 +5935,19 @@ function drawBird() {
     Math.PI * 2
   );
 
-
   ctx.fill();
-
 
   ctx.shadowBlur =
     0;
 
+  /*
+     Body shading.
+  */
 
   ctx.fillStyle =
     "rgba(0,0,0,.17)";
 
-
   ctx.beginPath();
-
 
   ctx.ellipse(
     -8,
@@ -3171,16 +5959,38 @@ function drawBird() {
     Math.PI * 2
   );
 
+  ctx.fill();
+
+  /*
+     Wing.
+  */
+
+  ctx.fillStyle =
+    "rgba(255,255,255,.22)";
+
+  ctx.beginPath();
+
+  ctx.ellipse(
+    -7,
+    5,
+    9,
+    5 +
+    bird.pulse * 4,
+    -.3,
+    0,
+    Math.PI * 2
+  );
 
   ctx.fill();
 
+  /*
+     Eye.
+  */
 
   ctx.fillStyle =
     "white";
 
-
   ctx.beginPath();
-
 
   ctx.arc(
     7,
@@ -3190,16 +6000,12 @@ function drawBird() {
     Math.PI * 2
   );
 
-
   ctx.fill();
-
 
   ctx.fillStyle =
     "#101018";
 
-
   ctx.beginPath();
-
 
   ctx.arc(
     9,
@@ -3209,40 +6015,35 @@ function drawBird() {
     Math.PI * 2
   );
 
-
   ctx.fill();
 
+  /*
+     Beak.
+  */
 
   ctx.fillStyle =
     "#ff9e42";
 
-
   ctx.beginPath();
-
 
   ctx.moveTo(
     17,
     -1
   );
 
-
   ctx.lineTo(
     33,
     5
   );
-
 
   ctx.lineTo(
     17,
     9
   );
 
-
   ctx.closePath();
 
-
   ctx.fill();
-
 
   ctx.restore();
 
@@ -3265,28 +6066,62 @@ function drawParticles() {
         particle.life
       );
 
-
     ctx.fillStyle =
       particle.color;
 
-
     ctx.beginPath();
-
 
     ctx.arc(
       particle.x,
       particle.y,
       particle.size *
-        particle.life,
+      particle.life,
       0,
       Math.PI * 2
     );
-
 
     ctx.fill();
 
   }
 
+  ctx.globalAlpha =
+    1;
+
+}
+
+
+/* ============================================================
+   SHOCKWAVES
+   ============================================================ */
+
+function drawShockwaves() {
+
+  for (
+    const wave of shockwaves
+  ) {
+
+    ctx.globalAlpha =
+      wave.life;
+
+    ctx.strokeStyle =
+      wave.color;
+
+    ctx.lineWidth =
+      3;
+
+    ctx.beginPath();
+
+    ctx.arc(
+      wave.x,
+      wave.y,
+      wave.radius,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.stroke();
+
+  }
 
   ctx.globalAlpha =
     1;
@@ -3303,46 +6138,110 @@ function drawGround() {
   const ground =
     ctx.createLinearGradient(
       0,
-      H - 40,
+      H - 42,
       0,
       H
     );
-
 
   ground.addColorStop(
     0,
     "#193c59"
   );
 
-
   ground.addColorStop(
     1,
     "#060e1d"
   );
 
-
   ctx.fillStyle =
     ground;
 
-
   ctx.fillRect(
     0,
-    H - 40,
+    H - 42,
     W,
-    40
+    42
   );
 
-
   ctx.fillStyle =
-    "rgba(91,211,160,.4)";
-
+    "rgba(91,211,160,.45)";
 
   ctx.fillRect(
     0,
-    H - 40,
+    H - 42,
     W,
     5
   );
+
+}
+
+
+/* ============================================================
+   ZONE TEXT
+   ============================================================ */
+
+function drawZoneText() {
+
+  if (
+    frame < 130 &&
+    score === 0
+  ) {
+
+    return;
+
+  }
+
+  const names = [
+
+    "NEBULA OUTPOST",
+    "PURPLE VOID",
+    "OCEAN NEBULA",
+    "CRIMSON SPACE",
+    "STAR KINGDOM",
+    "DEEP GALAXY"
+
+  ];
+
+  const name =
+    names[
+      zone % names.length
+    ];
+
+  if (
+    frame % 200 < 50
+  ) {
+
+    ctx.globalAlpha =
+      Math.min(
+        1,
+        (
+          50 -
+          (
+            frame % 200
+          )
+        ) /
+        30
+      );
+
+    ctx.fillStyle =
+      "rgba(255,255,255,.7)";
+
+    ctx.font =
+      "bold 13px Arial";
+
+    ctx.textAlign =
+      "center";
+
+    ctx.fillText(
+      name,
+      W / 2,
+      70
+    );
+
+    ctx.globalAlpha =
+      1;
+
+  }
 
 }
 
@@ -3353,11 +6252,46 @@ function drawGround() {
 
 function draw() {
 
+  ctx.save();
+
+  /*
+     Screen shake.
+  */
+
+  if (
+    screenShake > .5
+  ) {
+
+    ctx.translate(
+      random(
+        -screenShake,
+        screenShake
+      ),
+      random(
+        -screenShake,
+        screenShake
+      )
+    );
+
+  }
+
   drawBackground();
+
+  drawZoneText();
 
   drawPipes();
 
+  drawMeteors();
+
+  drawUFOs();
+
+  drawBoss();
+
   drawCoins();
+
+  drawGems();
+
+  drawPowerups();
 
   drawGround();
 
@@ -3369,6 +6303,9 @@ function draw() {
 
   drawParticles();
 
+  drawShockwaves();
+
+  ctx.restore();
 
   if (
     gameState ===
@@ -3376,8 +6313,7 @@ function draw() {
   ) {
 
     ctx.fillStyle =
-      "rgba(0,0,0,.28)";
-
+      "rgba(0,0,0,.3)";
 
     ctx.fillRect(
       0,
@@ -3395,7 +6331,9 @@ function draw() {
    GAME LOOP
    ============================================================ */
 
-function gameLoop(time) {
+function gameLoop(
+  time
+) {
 
   if (!lastTime) {
 
@@ -3404,24 +6342,21 @@ function gameLoop(time) {
 
   }
 
-
   const dt =
     Math.min(
-      (time - lastTime) /
-        16.67,
-
+      (
+        time -
+        lastTime
+      ) / 16.67,
       2
     );
-
 
   lastTime =
     time;
 
-
   update(dt);
 
   draw();
-
 
   requestAnimationFrame(
     gameLoop
@@ -3453,16 +6388,16 @@ function hidePanels() {
 }
 
 
-function showPanel(id) {
+function showPanel(
+  id
+) {
 
   hidePanels();
-
 
   const panel =
     document.getElementById(
       id
     );
-
 
   if (panel) {
 
@@ -3486,30 +6421,45 @@ function updateUI() {
   ).textContent =
     save.coins;
 
+  document.getElementById(
+    "gems"
+  ).textContent =
+    save.gems;
 
   document.getElementById(
     "highScore"
   ).textContent =
     save.highScore;
 
-
   document.getElementById(
     "menuCoins"
   ).textContent =
     save.coins;
 
+  document.getElementById(
+    "menuGems"
+  ).textContent =
+    save.gems;
 
   document.getElementById(
     "menuBest"
   ).textContent =
     save.highScore;
 
+  document.getElementById(
+    "menuGames"
+  ).textContent =
+    save.gamesPlayed;
 
   document.getElementById(
     "shopCoins"
   ).textContent =
     save.coins;
 
+  document.getElementById(
+    "shopGems"
+  ).textContent =
+    save.gems;
 
   document.getElementById(
     "score"
@@ -3519,11 +6469,110 @@ function updateUI() {
       ? score
       : "0";
 
+  const multiplierElement =
+    document.getElementById(
+      "multiplier"
+    );
+
+  multiplierElement.textContent =
+    `🔥 x${multiplier}`;
+
+  multiplierElement.style.opacity =
+    gameState === "playing" &&
+    multiplier > 1
+      ? "1"
+      : "0";
+
+  const powerStatus =
+    document.getElementById(
+      "powerStatus"
+    );
+
+  if (
+    gameState !==
+    "playing"
+  ) {
+
+    powerStatus.innerHTML =
+      "";
+
+    return;
+
+  }
+
+  const active = [];
+
+  if (
+    shieldActive
+  ) {
+
+    active.push(
+      "🛡️ SHIELD"
+    );
+
+  }
+
+  if (
+    magnetTimer > 0
+  ) {
+
+    active.push(
+      "🧲 " +
+      Math.ceil(
+        magnetTimer /
+        60
+      )
+    );
+
+  }
+
+  if (
+    slowTimer > 0
+  ) {
+
+    active.push(
+      "⏱️ " +
+      Math.ceil(
+        slowTimer /
+        60
+      )
+    );
+
+  }
+
+  if (
+    coinDoubleTimer > 0
+  ) {
+
+    active.push(
+      "🪙 2X"
+    );
+
+  }
+
+  if (
+    dashCooldown <= 0
+  ) {
+
+    active.push(
+      "💨 READY"
+    );
+
+  }
+
+  powerStatus.innerHTML =
+    active
+      .map(
+        text =>
+          `<div class="powerBadge">${text}</div>`
+      )
+      .join("");
+
 }
 
 
 /* ============================================================
-   MENU BUTTONS
+   MENU
    ============================================================ */
 
 document
@@ -3546,31 +6595,30 @@ document
   .getElementById("menuBtn")
   .addEventListener(
     "click",
-    () => {
-
-      gameState =
-        "menu";
-
-
-      bird =
-        null;
-
-
-      document.getElementById(
-        "pauseButton"
-      ).style.display =
-        "none";
-
-
-      showPanel(
-        "menuPanel"
-      );
-
-
-      updateUI();
-
-    }
+    goToMenu
   );
+
+
+function goToMenu() {
+
+  gameState =
+    "menu";
+
+  bird =
+    null;
+
+  document.getElementById(
+    "pauseButton"
+  ).style.display =
+    "none";
+
+  showPanel(
+    "menuPanel"
+  );
+
+  updateUI();
+
+}
 
 
 /* ============================================================
@@ -3617,7 +6665,7 @@ document
 
       showPanel(
         gameState ===
-          "gameover"
+        "gameover"
           ? "gameOverPanel"
           : "menuPanel"
       );
@@ -3626,15 +6674,15 @@ document
   );
 
 
-function buyUpgrade(key) {
+function buyUpgrade(
+  key
+) {
 
   const info =
     UPGRADES[key];
 
-
   const level =
     save.upgrades[key];
-
 
   if (
     level >=
@@ -3645,33 +6693,32 @@ function buyUpgrade(key) {
 
   }
 
-
   const cost =
     upgradeCost(key);
-
 
   if (
     save.coins <
     cost
   ) {
 
+    showToast(
+      "Not enough coins!"
+    );
+
     return;
 
   }
 
-
   save.coins -=
     cost;
 
-
   save.upgrades[key]++;
-
 
   saveGame();
 
-
-  playSound("buy");
-
+  playSound(
+    "power"
+  );
 
   renderShop();
 
@@ -3680,17 +6727,17 @@ function buyUpgrade(key) {
 }
 
 
-function buySkin(key) {
+function buySkin(
+  key
+) {
 
   const skin =
     SKINS[key];
-
 
   const unlocked =
     save.skins.unlocked.includes(
       key
     );
-
 
   if (
     unlocked
@@ -3699,9 +6746,7 @@ function buySkin(key) {
     save.skins.equipped =
       key;
 
-
     saveGame();
-
 
     renderShop();
 
@@ -3709,35 +6754,34 @@ function buySkin(key) {
 
   }
 
-
   if (
     save.coins <
     skin.price
   ) {
 
+    showToast(
+      "Not enough coins!"
+    );
+
     return;
 
   }
 
-
   save.coins -=
     skin.price;
-
 
   save.skins.unlocked.push(
     key
   );
 
-
   save.skins.equipped =
     key;
 
-
   saveGame();
 
-
-  playSound("buy");
-
+  playSound(
+    "power"
+  );
 
   renderShop();
 
@@ -3753,20 +6797,16 @@ function renderShop() {
       "upgradeGrid"
     );
 
-
   const skinGrid =
     document.getElementById(
       "skinGrid"
     );
 
-
   upgradeGrid.innerHTML =
     "";
 
-
   skinGrid.innerHTML =
     "";
-
 
   Object.entries(
     UPGRADES
@@ -3776,25 +6816,20 @@ function renderShop() {
       const level =
         save.upgrades[key];
 
-
       const maxed =
         level >=
         info.max;
 
-
       const cost =
         upgradeCost(key);
-
 
       const item =
         document.createElement(
           "div"
         );
 
-
       item.className =
         "shopItem";
-
 
       item.innerHTML = `
 
@@ -3832,7 +6867,6 @@ function renderShop() {
 
       `;
 
-
       item
         .querySelector(
           "button"
@@ -3843,14 +6877,12 @@ function renderShop() {
             buyUpgrade(key)
         );
 
-
       upgradeGrid.appendChild(
         item
       );
 
     }
   );
-
 
   Object.entries(
     SKINS
@@ -3862,21 +6894,17 @@ function renderShop() {
           key
         );
 
-
       const equipped =
         save.skins.equipped ===
         key;
-
 
       const item =
         document.createElement(
           "div"
         );
 
-
       item.className =
         "shopItem";
-
 
       item.innerHTML = `
 
@@ -3891,7 +6919,7 @@ function renderShop() {
         <p
           style="color:${skin.color}"
         >
-          ● SPECIAL SKIN
+          ● GALAXY SKIN
         </p>
 
         <button
@@ -3901,7 +6929,7 @@ function renderShop() {
             (
               !unlocked &&
               save.coins <
-                skin.price
+              skin.price
             )
               ? "disabled"
               : ""
@@ -3919,7 +6947,6 @@ function renderShop() {
 
       `;
 
-
       item
         .querySelector(
           "button"
@@ -3930,14 +6957,12 @@ function renderShop() {
             buySkin(key)
         );
 
-
       skinGrid.appendChild(
         item
       );
 
     }
   );
-
 
   updateUI();
 
@@ -3957,7 +6982,6 @@ document
     () => {
 
       renderMissions();
-
 
       showPanel(
         "missionsPanel"
@@ -3990,96 +7014,12 @@ function renderMissions() {
       "missionList"
     );
 
-
   list.innerHTML =
     "";
 
-
   updateMissionProgress();
 
-
-  const missions = [
-
-    {
-
-      key:
-        "score25",
-
-      name:
-        "High Flyer",
-
-      description:
-        "Reach a score of 25.",
-
-      max:
-        25,
-
-      reward:
-        150
-
-    },
-
-    {
-
-      key:
-        "coins50",
-
-      name:
-        "Treasure Hunter",
-
-      description:
-        "Collect 50 coins.",
-
-      max:
-        50,
-
-      reward:
-        250
-
-    },
-
-    {
-
-      key:
-        "games10",
-
-      name:
-        "Persistent",
-
-      description:
-        "Play 10 games.",
-
-      max:
-        10,
-
-      reward:
-        300
-
-    },
-
-    {
-
-      key:
-        "score50",
-
-      name:
-        "Galaxy Master",
-
-      description:
-        "Reach a score of 50.",
-
-      max:
-        50,
-
-      reward:
-        500
-
-    }
-
-  ];
-
-
-  missions.forEach(
+  MISSIONS.forEach(
     mission => {
 
       const value =
@@ -4087,31 +7027,25 @@ function renderMissions() {
           save.missions[
             mission.key
           ],
-
           mission.max
         );
-
 
       const complete =
         value >=
         mission.max;
-
 
       const claimed =
         save.missionClaimed[
           mission.key
         ];
 
-
       const item =
         document.createElement(
           "div"
         );
 
-
       item.className =
         "mission";
-
 
       item.innerHTML = `
 
@@ -4135,11 +7069,9 @@ function renderMissions() {
 
         </div>
 
-
         <div class="missionDescription">
           ${mission.description}
         </div>
-
 
         <div class="progress">
 
@@ -4157,12 +7089,11 @@ function renderMissions() {
 
         </div>
 
-
         <div
           style="
             color:#7f8ba8;
-            font-size:10px;
-            margin-top:6px;
+            font-size:9px;
+            margin-top:5px;
           "
         >
 
@@ -4170,16 +7101,15 @@ function renderMissions() {
 
           ${
             claimed
-              ? " • REWARD CLAIMED"
+              ? " • REWARD ADDED"
               : complete
-                ? " • REWARD ADDED"
+                ? " • COMPLETE"
                 : ""
           }
 
         </div>
 
       `;
-
 
       list.appendChild(
         item
@@ -4188,10 +7118,357 @@ function renderMissions() {
     }
   );
 
+}
 
-  saveGame();
+
+/* ============================================================
+   ACHIEVEMENTS
+   ============================================================ */
+
+document
+  .getElementById(
+    "achievementsBtn"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      renderAchievements();
+
+      showPanel(
+        "achievementsPanel"
+      );
+
+    }
+  );
+
+
+document
+  .getElementById(
+    "backAchievements"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      showPanel(
+        "menuPanel"
+      );
+
+    }
+  );
+
+
+function renderAchievements() {
+
+  const list =
+    document.getElementById(
+      "achievementList"
+    );
+
+  list.innerHTML =
+    "";
+
+  ACHIEVEMENTS.forEach(
+    achievement => {
+
+      const unlocked =
+        Boolean(
+          save.achievements[
+            achievement.key
+          ]
+        );
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+      item.className =
+        "achievement" +
+        (
+          unlocked
+            ? ""
+            : " locked"
+        );
+
+      item.innerHTML = `
+
+        <div class="achievementIcon">
+          ${
+            unlocked
+              ? achievement.icon
+              : "🔒"
+          }
+        </div>
+
+        <div class="achievementText">
+
+          <div class="achievementName">
+            ${achievement.name}
+          </div>
+
+          <div class="achievementDesc">
+            ${achievement.description}
+          </div>
+
+        </div>
+
+        <div>
+          ${
+            unlocked
+              ? "✅"
+              : ""
+          }
+        </div>
+
+      `;
+
+      list.appendChild(
+        item
+      );
+
+    }
+  );
 
 }
+
+
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+
+document
+  .getElementById(
+    "settingsBtn"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      showPanel(
+        "settingsPanel"
+      );
+
+    }
+  );
+
+
+document
+  .getElementById(
+    "backSettings"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      showPanel(
+        "menuPanel"
+      );
+
+    }
+  );
+
+
+/* ============================================================
+   EXPORT SAVE
+   ============================================================ */
+
+document
+  .getElementById(
+    "exportSaveBtn"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      const pkg =
+        makeSavePackage();
+
+      const blob =
+        new Blob(
+          [
+            JSON.stringify(
+              pkg,
+              null,
+              2
+            )
+          ],
+          {
+            type:
+              "application/json"
+          }
+        );
+
+      const url =
+        URL.createObjectURL(
+          blob
+        );
+
+      const link =
+        document.createElement(
+          "a"
+        );
+
+      link.href =
+        url;
+
+      link.download =
+        "flappy-galaxy-save.json";
+
+      document.body.appendChild(
+        link
+      );
+
+      link.click();
+
+      link.remove();
+
+      URL.revokeObjectURL(
+        url
+      );
+
+      showToast(
+        "📦 SAVE EXPORTED"
+      );
+
+    }
+  );
+
+
+/* ============================================================
+   IMPORT SAVE
+   ============================================================ */
+
+const importInput =
+  document.getElementById(
+    "importInput"
+  );
+
+
+document
+  .getElementById(
+    "importSaveBtn"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      importInput.click();
+
+    }
+  );
+
+
+importInput.addEventListener(
+  "change",
+  async event => {
+
+    const file =
+      event.target.files[0];
+
+    if (!file) {
+
+      return;
+
+    }
+
+    try {
+
+      const text =
+        await file.text();
+
+      const pkg =
+        JSON.parse(
+          text
+        );
+
+      if (
+        !validateSavePackage(
+          pkg
+        )
+      ) {
+
+        throw new Error(
+          "Invalid save"
+        );
+
+      }
+
+      save =
+        mergeSave(
+          pkg.data
+        );
+
+      saveGame();
+
+      updateUI();
+
+      showToast(
+        "📥 SAVE IMPORTED!"
+      );
+
+    } catch {
+
+      showToast(
+        "❌ INVALID SAVE"
+      );
+
+    }
+
+    importInput.value =
+      "";
+
+  }
+);
+
+
+/* ============================================================
+   RESET SAVE
+   ============================================================ */
+
+document
+  .getElementById(
+    "resetSaveBtn"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      const confirmed =
+        window.confirm(
+          "Delete ALL Flappy Galaxy progress? This cannot be undone."
+        );
+
+      if (!confirmed) {
+
+        return;
+
+      }
+
+      localStorage.removeItem(
+        SAVE_KEY
+      );
+
+      localStorage.removeItem(
+        BACKUP_KEY
+      );
+
+      save =
+        createDefaultSave();
+
+      showToast(
+        "DATA RESET"
+      );
+
+      updateUI();
+
+      showPanel(
+        "menuPanel"
+      );
+
+    }
+  );
 
 
 /* ============================================================
@@ -4215,10 +7492,8 @@ document
 
       }
 
-
       gameState =
         "paused";
-
 
       showPanel(
         "pausePanel"
@@ -4239,10 +7514,8 @@ document
       gameState =
         "playing";
 
-
       lastTime =
         performance.now();
-
 
       hidePanels();
 
@@ -4256,30 +7529,7 @@ document
   )
   .addEventListener(
     "click",
-    () => {
-
-      gameState =
-        "menu";
-
-
-      bird =
-        null;
-
-
-      document.getElementById(
-        "pauseButton"
-      ).style.display =
-        "none";
-
-
-      showPanel(
-        "menuPanel"
-      );
-
-
-      updateUI();
-
-    }
+    goToMenu
   );
 
 
@@ -4291,20 +7541,25 @@ document.addEventListener(
   "keydown",
   event => {
 
-    const flapKeys =
+    const flapKey =
       event.code ===
-        "Space" ||
-
+      "Space" ||
       event.code ===
-        "ArrowUp";
+      "ArrowUp";
 
+    const dashKey =
+      event.code ===
+      "ShiftLeft" ||
+      event.code ===
+      "ShiftRight" ||
+      event.code ===
+      "KeyX";
 
     if (
-      flapKeys
+      flapKey
     ) {
 
       event.preventDefault();
-
 
       if (
         gameState ===
@@ -4341,10 +7596,8 @@ document.addEventListener(
         gameState =
           "playing";
 
-
         lastTime =
           performance.now();
-
 
         hidePanels();
 
@@ -4352,6 +7605,15 @@ document.addEventListener(
 
     }
 
+    if (
+      dashKey
+    ) {
+
+      event.preventDefault();
+
+      dash();
+
+    }
 
     if (
       event.code ===
@@ -4365,7 +7627,6 @@ document.addEventListener(
 
         gameState =
           "paused";
-
 
         showPanel(
           "pausePanel"
@@ -4381,10 +7642,8 @@ document.addEventListener(
         gameState =
           "playing";
 
-
         lastTime =
           performance.now();
-
 
         hidePanels();
 
@@ -4397,7 +7656,7 @@ document.addEventListener(
 
 
 /* ============================================================
-   TOUCH / MOUSE
+   TOUCH / POINTER
    ============================================================ */
 
 canvas.addEventListener(
@@ -4405,7 +7664,6 @@ canvas.addEventListener(
   event => {
 
     event.preventDefault();
-
 
     if (
       gameState ===
@@ -4435,42 +7693,50 @@ canvas.addEventListener(
     }
 
   },
-
   {
     passive: false
   }
-
 );
 
 
-/* ============================================================
-   PREVENT MOBILE DOUBLE-TAP ZOOM
-   ============================================================ */
+/*
+   Double-tap prevention.
+*/
+
+let lastTouch =
+  0;
 
 document.addEventListener(
-  "touchstart",
+  "touchend",
   event => {
 
+    const now =
+      Date.now();
+
     if (
-      event.touches.length >
-      1
+      now -
+      lastTouch <
+      300
     ) {
 
       event.preventDefault();
 
     }
 
-  },
+    lastTouch =
+      now;
 
+  },
   {
     passive: false
   }
 );
 
 
-/* ============================================================
-   PREVENT PULL-TO-REFRESH / OVERSCROLL
-   ============================================================ */
+/*
+   Prevent pull-to-refresh and page scrolling
+   except inside intentional scroll areas.
+*/
 
 document.addEventListener(
   "touchmove",
@@ -4486,11 +7752,9 @@ document.addEventListener(
 
     }
 
-
     event.preventDefault();
 
   },
-
   {
     passive: false
   }
@@ -4498,15 +7762,103 @@ document.addEventListener(
 
 
 /* ============================================================
-   INITIALIZE
+   VISIBILITY / BACKGROUND
    ============================================================ */
 
-updateUI();
+document.addEventListener(
+  "visibilitychange",
+  () => {
 
+    if (
+      document.hidden &&
+      gameState ===
+      "playing"
+    ) {
+
+      gameState =
+        "paused";
+
+      showPanel(
+        "pausePanel"
+      );
+
+    }
+
+    saveGame();
+
+  }
+);
+
+
+/* ============================================================
+   PAGE LIFECYCLE SAVE
+   ============================================================ */
+
+window.addEventListener(
+  "pagehide",
+  saveGame
+);
+
+window.addEventListener(
+  "beforeunload",
+  saveGame
+);
+
+
+/* ============================================================
+   RESIZE
+   ============================================================ */
+
+/*
+   The game itself always renders at 430x720.
+
+   CSS scales that exact game surface to the available
+   phone screen. This prevents gameplay coordinates from
+   changing between iPhone and Android resolutions.
+*/
+
+function handleResize() {
+
+  /*
+     Force a redraw after orientation changes.
+  */
+
+  draw();
+
+}
+
+
+window.addEventListener(
+  "resize",
+  handleResize
+);
+
+window.addEventListener(
+  "orientationchange",
+  () => {
+
+    setTimeout(
+      handleResize,
+      100
+    );
+
+  }
+);
+
+
+/* ============================================================
+   INITIALIZATION
+   ============================================================ */
+
+updateMissionProgress();
+
+updateUI();
 
 showPanel(
   "menuPanel"
 );
+
+saveGame();
 
 </script>
 
