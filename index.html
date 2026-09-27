@@ -1225,10 +1225,208 @@ button:disabled {
 
 }
 
+/* ============================================================
+   GALAXY BOOT SCREEN
+   ============================================================ */
+#bootLoader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(83,104,255,.24), transparent 36%),
+    radial-gradient(circle at 18% 82%, rgba(182,53,191,.14), transparent 28%),
+    #02040c;
+  transition: opacity .45s ease, visibility .45s ease;
+}
+#bootLoader.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.bootCard {
+  position: relative;
+  width: min(360px, 100%);
+  padding: 34px 28px 27px;
+  overflow: hidden;
+  border: 1px solid rgba(160,184,255,.18);
+  border-radius: 28px;
+  text-align: center;
+  background: linear-gradient(145deg, rgba(17,27,62,.94), rgba(5,9,25,.96));
+  box-shadow: 0 28px 90px rgba(0,0,0,.56), inset 0 1px rgba(255,255,255,.06);
+  animation: bootCardIn .55s cubic-bezier(.2,1.2,.3,1) both;
+}
+.bootCard::before,
+.bootCard::after {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #b9faff;
+  box-shadow: 0 0 14px 4px rgba(91,232,255,.6);
+}
+.bootCard::before { top: 28px; left: 34px; }
+.bootCard::after { top: 66px; right: 30px; width: 3px; height: 3px; }
+@keyframes bootCardIn {
+  from { opacity: 0; transform: translateY(14px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.bootOrb {
+  width: 78px;
+  height: 78px;
+  margin: 0 auto 17px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(107,238,255,.55);
+  border-radius: 25px;
+  background: radial-gradient(circle at 35% 25%, rgba(115,242,255,.25), rgba(95,112,255,.08) 66%);
+  box-shadow: 0 0 35px rgba(73,223,255,.2), inset 0 0 22px rgba(91,222,255,.13);
+  font-size: 39px;
+  animation: bootFloat 2.4s ease-in-out infinite;
+}
+@keyframes bootFloat {
+  50% { transform: translateY(-5px) rotate(4deg); }
+}
+.bootEyebrow {
+  color: #9eacd0;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 2.6px;
+}
+.bootTitle {
+  margin-top: 9px;
+  font-size: clamp(28px, 8vw, 38px);
+  line-height: .98;
+  font-weight: 1000;
+  letter-spacing: -1.7px;
+  color: #f4f7ff;
+}
+.bootTitle span {
+  background: linear-gradient(90deg, #55efff, #9a7cff, #ff65d5);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.bootCopy {
+  margin: 12px 0 23px;
+  color: #9ca8c5;
+  font-size: 12px;
+}
+.bootTrack {
+  height: 8px;
+  padding: 2px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(0,0,0,.42);
+  box-shadow: inset 0 1px 4px rgba(0,0,0,.6);
+}
+#bootProgress {
+  width: 8%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #55efff, #9c77ff, #ff65d5);
+  box-shadow: 0 0 12px rgba(86,226,255,.6);
+  transition: width .32s ease;
+}
+#bootStatus {
+  min-height: 15px;
+  margin-top: 11px;
+  color: #c4cdec;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .8px;
+}
+.bootStars {
+  margin-top: 20px;
+  color: #606d91;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+}
+#gemProgress {
+  --gem-progress: 0%;
+  position: absolute;
+  top: 20.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 11px 7px;
+  overflow: hidden;
+  border: 1px solid rgba(94,235,255,.2);
+  border-radius: 999px;
+  background: rgba(4,8,25,.68);
+  color: #bbf7ff;
+  font-size: 9px;
+  line-height: 1.1;
+  font-weight: 1000;
+  letter-spacing: .8px;
+  white-space: nowrap;
+  text-shadow: 0 2px 8px rgba(0,0,0,.65);
+  z-index: 9;
+  transition: border-color .2s, color .2s;
+}
+#gemProgress::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: var(--gem-progress);
+  height: 2px;
+  background: linear-gradient(90deg, #55efff, #9c77ff);
+  transition: width .2s ease;
+}
+#gemProgress.hasGem {
+  border-color: rgba(255,216,77,.55);
+  color: #ffe889;
+  animation: gemHudPulse .8s ease-in-out infinite alternate;
+}
+@keyframes gemHudPulse {
+  to { box-shadow: 0 0 16px rgba(255,216,77,.25); }
+}
+/* PILOT LEADERBOARD */
+.leaderboardProfile { margin:12px 0 8px; padding:11px; border:1px solid rgba(255,255,255,.08); border-radius:15px; text-align:left; background:rgba(255,255,255,.045); }
+.leaderboardLabel { display:block; margin-bottom:7px; color:#98a6c7; font-size:9px; font-weight:1000; letter-spacing:1px; }
+.leaderboardNameRow { display:flex; align-items:stretch; gap:7px; }
+#leaderboardNameInput { flex:1; width:0; min-width:0; min-height:42px; padding:9px 11px; border:1px solid rgba(128,160,255,.25); border-radius:11px; outline:none; color:#fff; background:rgba(2,5,17,.72); font:700 13px Arial,Helvetica,sans-serif; touch-action:auto; -webkit-user-select:text; user-select:text; }
+#leaderboardNameInput:focus { border-color:#65eaff; }
+#savePilotNameBtn { width:auto; min-width:72px; min-height:42px; margin:0; padding:8px 12px; font-size:10px; }
+.leaderboardNotice { margin:8px 0 10px; color:#8492b1; font-size:9px; line-height:1.4; }
+.leaderboardList { display:grid; gap:6px; max-height:255px; text-align:left; }
+.leaderboardRow { display:grid; grid-template-columns:34px minmax(0,1fr) auto; align-items:center; gap:8px; padding:9px; border:1px solid rgba(255,255,255,.06); border-radius:12px; background:rgba(255,255,255,.045); }
+.leaderboardRow.currentPilot { border-color:rgba(89,232,255,.5); background:rgba(61,177,214,.12); }
+.leaderboardRank { color:#ffe071; font-size:13px; font-weight:1000; text-align:center; }
+.leaderboardPilot { overflow:hidden; color:#eef2ff; font-size:11px; font-weight:1000; text-overflow:ellipsis; white-space:nowrap; }
+.leaderboardYou { display:block; margin-top:3px; color:#71eaff; font-size:8px; letter-spacing:.8px; }
+.leaderboardScore { color:#c5d2f1; font-size:11px; font-weight:1000; white-space:nowrap; }
+.leaderboardEmpty { padding:18px 10px; border:1px dashed rgba(255,255,255,.13); border-radius:13px; color:#9ba7c2; font-size:11px; line-height:1.5; text-align:center; }
+.menuQuickRow { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.menuQuickRow button { min-height:43px; margin:5px 0; padding:8px 5px; font-size:10px; }
+.dailyRewardCard { margin:15px 0 12px; padding:17px 14px; border:1px solid rgba(104,225,255,.2); border-radius:18px; background:radial-gradient(circle at 50% 0,rgba(83,148,255,.16),transparent 68%),rgba(255,255,255,.045); }
+.dailyRewardIcon { margin-bottom:7px; font-size:38px; filter:drop-shadow(0 0 14px rgba(92,225,255,.35)); }
+.dailyRewardAmount { color:#8ff5ff; font-size:26px; font-weight:1000; }
+.dailyRewardCopy { margin:5px 0 12px; color:#a1aecb; font-size:10px; line-height:1.4; }
+#dailyRewardStreak { display:inline-block; margin:6px 0 10px; padding:6px 10px; border:1px solid rgba(255,214,92,.2); border-radius:999px; color:#ffe58a; background:rgba(255,204,68,.07); font-size:10px; font-weight:1000; }
+#claimDailyRewardBtn { margin-top:5px; }
+#claimDailyRewardBtn:disabled { opacity:.55; }
 </style>
 </head>
 
 <body>
+<div id="bootLoader" role="status" aria-live="polite">
+  <div class="bootCard">
+    <div class="bootOrb" aria-hidden="true">💎</div>
+    <div class="bootEyebrow">LILVELLUX PRESENTS</div>
+    <div class="bootTitle">FLAPPY<br><span>GALAXY</span></div>
+    <div class="bootCopy">Preparing your next run...</div>
+    <div class="bootTrack" aria-hidden="true"><div id="bootProgress"></div></div>
+    <div id="bootStatus">Mapping the stars</div>
+    <div class="bootStars">✦ &nbsp; READY FOR TAKEOFF &nbsp; ✦</div>
+  </div>
+</div>
+
 
 <div id="gameWrap">
 
@@ -1291,6 +1489,7 @@ button:disabled {
     🔥 x1
   </div>
 
+  <div id="gemProgress" aria-live="polite">💎 GUARANTEED DIAMOND EVERY 20 SCORE</div>
   <div id="powerStatus"></div>
 
   <div id="toast"></div>
@@ -1343,6 +1542,10 @@ button:disabled {
 
       </div>
 
+      <div class="menuQuickRow">
+  <button id="leaderboardBtn" class="secondary" type="button">🏆 LEADERBOARD</button>
+  <button id="dailyRewardBtn" class="gold" type="button">🎁 DAILY +5 💎</button>
+</div>
       <button id="playBtn" type="button">
         🚀 PLAY
       </button>
@@ -1393,7 +1596,34 @@ button:disabled {
          CASE OPENING OVERLAY
          ====================================================== -->
 
-    <div
+    <div class="panel hidden" id="dailyRewardPanel">
+  <div class="logo" style="font-size:32px">DAILY DROP</div>
+  <div class="subtitle">A little stardust for every day you fly.</div>
+  <div class="dailyRewardCard">
+    <div class="dailyRewardIcon" aria-hidden="true">🎁</div>
+    <div class="dailyRewardAmount">+5 💎</div>
+    <div id="dailyRewardStreak">🔥 0 DAY STREAK</div>
+    <div id="dailyRewardStatus" class="dailyRewardCopy">Your daily diamonds are ready.</div>
+    <button id="claimDailyRewardBtn" class="gold" type="button">CLAIM 5 DIAMONDS</button>
+  </div>
+  <div class="hint">One claim per day. Your next reward resets at local midnight.</div>
+  <button id="backDailyReward" class="secondary" type="button">← BACK</button>
+</div>
+<div class="panel hidden" id="leaderboardPanel">
+  <div class="logo" style="font-size:32px">PILOT RANKINGS</div>
+  <div class="subtitle">Set a name and chase the top score.</div>
+  <div class="leaderboardProfile">
+    <label class="leaderboardLabel" for="leaderboardNameInput">YOUR PILOT NAME</label>
+    <div class="leaderboardNameRow">
+      <input id="leaderboardNameInput" type="text" maxlength="16" autocomplete="nickname" placeholder="Enter your name">
+      <button id="savePilotNameBtn" type="button">SAVE</button>
+    </div>
+  </div>
+  <div class="leaderboardNotice">Scores are saved in this browser. Share this device with friends to compare pilots.</div>
+  <div id="leaderboardList" class="scrollArea leaderboardList"></div>
+  <button id="backLeaderboard" class="secondary" type="button">← BACK</button>
+</div>
+<div
       id="caseOpeningOverlay"
       class="caseOpeningOverlay hidden"
       aria-hidden="true"
@@ -1673,6 +1903,9 @@ button:disabled {
         id="newBest"
       ></div>
 
+      <button id="gameOverLeaderboardBtn" class="secondary" type="button">
+        🏆 VIEW LEADERBOARD
+      </button>
       <button
         id="retryBtn"
         type="button"
@@ -1833,6 +2066,9 @@ const DEFAULT_SAVE = {
   gems: 0,
 
   highScore: 0,
+  dailyReward: { lastClaimDay: "", streak: 0 },
+  playerName: "Pilot",
+  leaderboard: [],
 
   totalFlaps: 0,
   totalCoins: 0,
@@ -1985,6 +2221,34 @@ function mergeSave(
     ...(loaded.settings || {})
   };
 
+  result.playerName =
+    String(result.playerName || "Pilot")
+      .replace(/[^A-Za-z0-9 _.-]/g, "")
+      .trim()
+      .slice(0, 16) || "Pilot";
+
+  result.leaderboard =
+    (Array.isArray(result.leaderboard) ? result.leaderboard : [])
+      .filter(entry => entry && typeof entry.name === "string" && Number.isFinite(Number(entry.score)) && Number(entry.score) >= 0)
+      .map(entry => ({
+        name: String(entry.name).replace(/[^A-Za-z0-9 _.-]/g, "").trim().slice(0, 16) || "Pilot",
+        score: Math.floor(Number(entry.score))
+      }))
+      .filter((entry, index, entries) =>
+        entries.findIndex(other => other.name.toLowerCase() === entry.name.toLowerCase()) === index
+      )
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 10);
+  result.dailyReward = {
+    ...base.dailyReward,
+    ...(loaded.dailyReward || {})
+  };
+  result.dailyReward.lastClaimDay =
+    typeof result.dailyReward.lastClaimDay === "string"
+      ? result.dailyReward.lastClaimDay
+      : "";
+  result.dailyReward.streak =
+    Math.max(0, Math.floor(Number(result.dailyReward.streak) || 0));
   result.version =
     SAVE_VERSION;
 
@@ -2346,7 +2610,17 @@ const SKINS = {
     color: "#f7f7ff",
     price: 250000,
     gemPrice: 0
-  }
+  },
+  frost: { name: "Frostwing", icon: "🧊", color: "#9be8ff", price: 8500, gemPrice: 0 },
+  phoenix: { name: "Phoenix", icon: "🐦‍🔥", color: "#ff743d", price: 15000, gemPrice: 0 },
+  pixel: { name: "Pixel Pilot", icon: "👾", color: "#75ff8f", price: 22000, gemPrice: 0 },
+  shadow: { name: "Shadow", icon: "🌑", color: "#b1a4ff", price: 30000, gemPrice: 0 },
+  prism: { name: "Prism", icon: "🔮", color: "#ff85ee", price: 45000, gemPrice: 0 },
+  mecha: { name: "Mecha", icon: "🤖", color: "#d2e3ff", price: 65000, gemPrice: 0 },
+  stardust: { name: "Stardust", icon: "✨", color: "#ffe8a3", price: 95000, gemPrice: 0 },
+  storm: { name: "Stormchaser", icon: "🌩️", color: "#8db8ff", price: 135000, gemPrice: 0 },
+  sakura: { name: "Sakura", icon: "🌸", color: "#ff8fb3", price: 180000, gemPrice: 0 },
+  astral: { name: "Astral", icon: "🪐", color: "#93fff1", price: 250000, gemPrice: 0 }
 };
 
 
@@ -2404,9 +2678,52 @@ const CASES = {
       { type: "skin", key: "golden", weight: 7, label: "GOLDEN SKIN", icon: "👑", tier: "gold" },
       { type: "skin", key: "neon", weight: 5, label: "NEON SKIN", icon: "💠", tier: "rare" }
     ]
-  }
-};
+  },
+  prism: {
+    name: "Prism Skin Case", icon: "🔮",
+    description: "A color-splashed case packed with exclusive bird skins.",
+    cost: 12, duplicateCoins: 2500,
+    rewards: [
+      { type: "skin", key: "frost", weight: 18, label: "FROSTWING SKIN", icon: "🧊", tier: "rare" },
+      { type: "skin", key: "phoenix", weight: 18, label: "PHOENIX SKIN", icon: "🐦‍🔥", tier: "rare" },
+      { type: "skin", key: "pixel", weight: 18, label: "PIXEL PILOT SKIN", icon: "👾", tier: "rare" },
+      { type: "skin", key: "shadow", weight: 10, label: "SHADOW SKIN", icon: "🌑", tier: "rare" },
+      { type: "skin", key: "prism", weight: 6, label: "PRISM SKIN", icon: "🔮", tier: "gold" },
+      { type: "gems", amount: 8, weight: 8, label: "8 DIAMONDS", icon: "💎", tier: "rare" },
+      { type: "coins", amount: 1800, weight: 12, label: "1,800 COINS", icon: "🪙", tier: "common" }
+    ]
+  },
 
+  nebula: {
+    name: "Mecha Nebula Case", icon: "🛸",
+    description: "High-tech pilots, star metal and a chance at a big gem drop.",
+    cost: 24, duplicateCoins: 6500,
+    rewards: [
+      { type: "skin", key: "pixel", weight: 12, label: "PIXEL PILOT SKIN", icon: "👾", tier: "rare" },
+      { type: "skin", key: "mecha", weight: 18, label: "MECHA SKIN", icon: "🤖", tier: "rare" },
+      { type: "skin", key: "stardust", weight: 16, label: "STARDUST SKIN", icon: "✨", tier: "gold" },
+      { type: "skin", key: "storm", weight: 12, label: "STORMCHASER SKIN", icon: "🌩️", tier: "gold" },
+      { type: "gems", amount: 15, weight: 8, label: "15 DIAMONDS", icon: "💎", tier: "rare" },
+      { type: "coins", amount: 6500, weight: 14, label: "6,500 COINS", icon: "🪙", tier: "common" },
+      { type: "coins", amount: 15000, weight: 5, label: "15,000 GOLD JACKPOT", icon: "🏆", tier: "gold" }
+    ]
+  },
+
+  eclipse: {
+    name: "Eclipse Crown Case", icon: "🌘",
+    description: "A premium skin case with the rarest celestial pilots.",
+    cost: 42, duplicateCoins: 14000,
+    rewards: [
+      { type: "skin", key: "shadow", weight: 15, label: "SHADOW SKIN", icon: "🌑", tier: "rare" },
+      { type: "skin", key: "sakura", weight: 15, label: "SAKURA SKIN", icon: "🌸", tier: "gold" },
+      { type: "skin", key: "astral", weight: 8, label: "ASTRAL SKIN", icon: "🪐", tier: "gold" },
+      { type: "skin", key: "stardust", weight: 12, label: "STARDUST SKIN", icon: "✨", tier: "rare" },
+      { type: "gems", amount: 30, weight: 8, label: "30 DIAMONDS", icon: "💎", tier: "rare" },
+      { type: "coins", amount: 18000, weight: 12, label: "18,000 COINS", icon: "🪙", tier: "common" },
+      { type: "coins", amount: 40000, weight: 4, label: "40,000 GOLD JACKPOT", icon: "👑", tier: "gold" }
+    ]
+  },
+};
 
 function pickCaseReward(caseInfo) {
   const totalWeight = caseInfo.rewards.reduce(
@@ -2498,16 +2815,19 @@ function finishCaseReward(reward, caseInfo) {
     const alreadyOwned = save.skins.unlocked.includes(reward.key);
 
     if (alreadyOwned) {
-      save.coins += 500;
+      const duplicateBonus = caseInfo.duplicateCoins || 500;
+      save.coins += duplicateBonus;
       reward._duplicate = true;
-      reward._bonus = 500;
+      reward._bonus = duplicateBonus;
     } else {
-      save.skins.unlocked.push(reward.key);
+      checkExtendedAchievements();
+  save.skins.unlocked.push(reward.key);
       save.skins.equipped = reward.key;
     }
   }
 
   save.casesOpened++;
+  checkExtendedAchievements();
   unlockAchievement("case1");
   if (save.casesOpened >= 5) unlockAchievement("case5");
   if (save.casesOpened >= 10) unlockAchievement("case10");
@@ -2972,6 +3292,30 @@ const ACHIEVEMENTS = [
     icon: "💎",
     name: "Diamond Vault",
     description: "Collect 50 diamonds."
+  },
+  {
+    key: "score500", icon: "🌠", name: "Beyond Infinity",
+    description: "Reach a score of 500."
+  },
+  {
+    key: "daily3", icon: "📆", name: "Three-Day Orbit",
+    description: "Claim daily diamonds 3 days in a row."
+  },
+  {
+    key: "daily7", icon: "🔥", name: "Week in the Stars",
+    description: "Claim daily diamonds 7 days in a row."
+  },
+  {
+    key: "skin10", icon: "🎨", name: "Style Collector",
+    description: "Unlock 10 different bird skins."
+  },
+  {
+    key: "gems100", icon: "💎", name: "Diamond Comet",
+    description: "Collect 100 diamonds in total."
+  },
+  {
+    key: "case25", icon: "🗝️", name: "Vault Breaker",
+    description: "Claim rewards from 25 cases."
   }
 ];
 
@@ -2990,6 +3334,12 @@ let gems = [];
 let powerups = [];
 let meteors = [];
 let ufos = [];
+let ambientUfos = [
+  { x: 70, baseY: 160, phase: 0, speed: .22, scale: .55, alpha: .25 },
+  { x: 335, baseY: 510, phase: 2.3, speed: .16, scale: .42, alpha: .19 }
+];
+let shootingStars = [];
+let nextShootingStarAt = 0;
 let particles = [];
 let stars = [];
 let clouds = [];
@@ -3783,28 +4133,23 @@ function spawnMeteor() {
 
 
 function spawnUFO() {
+  const playerY = bird ? bird.y : H / 2;
+  const safeDirection = playerY < H / 2 ? 1 : -1;
+  const baseY = clamp(
+    playerY + safeDirection * 185 + random(-22, 22),
+    90,
+    H - 100
+  );
 
   ufos.push({
-
-    x:
-      W + 80,
-
-    y:
-      random(90, H - 100),
-
-    baseY:
-      random(90, H - 100),
-
-    t:
-      Math.random() * 10,
-
-    speed:
-      random(2.2, 3.8),
-
-    counted: false
-
+    x: W + 80,
+    y: baseY,
+    baseY,
+    t: Math.random() * 10,
+    speed: random(2.2, 3.8),
+    counted: false,
+    dodging: false
   });
-
 }
 
 
@@ -3931,9 +4276,52 @@ function circleCollision(
    SCORE / COMBO
    ============================================================ */
 
+function spawnMilestoneDiamonds(previousScore, nextScore) {
+  let milestoneScore = (Math.floor(previousScore / 20) + 1) * 20;
+  let offset = 0;
+
+  while (milestoneScore <= nextScore) {
+    gems.push({
+      x: W + 145 + offset * 112,
+      y: clamp((bird ? bird.y : H / 2) + offset * 34, 125, H - 125),
+      pulse: Math.random() * 6,
+      collected: false,
+      milestone: true,
+      milestoneScore
+    });
+
+    milestoneScore += 20;
+    offset++;
+  }
+}
+
+
+function checkExtendedAchievements() {
+  if (score >= 500) unlockAchievement("score500");
+  if (save.totalGems >= 25) unlockAchievement("gems25");
+  if (save.totalGems >= 50) unlockAchievement("gems50");
+  if (save.totalGems >= 100) unlockAchievement("gems100");
+  if (save.casesOpened >= 25) unlockAchievement("case25");
+  if (save.skins.unlocked.length >= 10) unlockAchievement("skin10");
+}
+
+function awardBonusScore(amount) {
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return;
+  }
+
+  const previousScore = score;
+  score += amount;
+  spawnMilestoneDiamonds(previousScore, score);
+  checkExtendedAchievements();
+}
+
 function addScorePoint() {
 
+  const previousScore = score;
   score++;
+  spawnMilestoneDiamonds(previousScore, score);
+  checkExtendedAchievements();
 
   save.totalScore++;
 
@@ -4189,6 +4577,7 @@ function collectGem(
   runGems += amount;
 
   save.gems += amount;
+  showToast(gem.milestone ? "💎 MILESTONE DIAMOND +" + amount : "💎 +" + amount + " DIAMOND");
 
   save.totalGems += amount;
 
@@ -4199,13 +4588,7 @@ function collectGem(
       amount
     );
 
-  unlockAchievement(
-    "gems25"
-  );
-
-  if (save.totalGems >= 50) {
-    unlockAchievement("gems50");
-  }
+  checkExtendedAchievements();
 
   createParticles(
     gem.x,
@@ -4595,7 +4978,13 @@ function endGame() {
 
   checkMissionRewards();
 
+    const localRank =
+    recordLeaderboardScore();
+
   saveGame();
+
+  
+
 
   document.getElementById(
     "finalScore"
@@ -4622,12 +5011,10 @@ function endGame() {
   ).textContent =
     "x" + maxCombo;
 
-  document.getElementById(
-    "newBest"
-  ).textContent =
-    isNewBest
-      ? "🏆 NEW HIGH SCORE!"
-      : "";
+  document.getElementById("newBest").textContent = [
+    isNewBest ? "🏆 NEW HIGH SCORE!" : "",
+    localRank === null ? "" : "LOCAL RANK #" + (localRank + 1)
+  ].filter(Boolean).join(" • ");
 
   const reviveButton =
     document.getElementById(
@@ -4884,8 +5271,7 @@ function update(
           1.5
         );
 
-        score +=
-          multiplier;
+        awardBonusScore(multiplier);
 
         continue;
 
@@ -5304,11 +5690,32 @@ function update(
       .07 *
       dt;
 
+        ufo.y =
+      ufo.baseY +
+      Math.sin(ufo.t) *
+      35;
+
+    // Give the player a wide berth as the UFO crosses the flight lane.
+    if (bird && Math.abs(ufo.x - bird.x) < 230) {
+      const safeTargets = [
+        clamp(bird.y - 125, 90, H - 100),
+        clamp(bird.y + 125, 90, H - 100)
+      ].filter(target => Math.abs(target - bird.y) > 90);
+
+      if (safeTargets.length) {
+        const target = safeTargets.reduce((best, candidate) =>
+          Math.abs(candidate - ufo.baseY) < Math.abs(best - ufo.baseY)
+            ? candidate
+            : best
+        );
+        ufo.baseY += clamp(target - ufo.baseY, -6 * dt, 6 * dt);
+        ufo.dodging = true;
+      }
+    }
+
     ufo.y =
       ufo.baseY +
-      Math.sin(
-        ufo.t
-      ) *
+      Math.sin(ufo.t) *
       35;
 
     if (
@@ -5329,15 +5736,9 @@ function update(
         ufo.x =
           -200;
 
-        score +=
-          2;
+        awardBonusScore(2);
 
-        createParticles(
-          ufo.x,
-          ufo.y,
-          "#ff62e6",
-          30
-        );
+        createParticles(bird.x, bird.y, "#ff62e6", 30);
 
       }
 
@@ -5345,8 +5746,7 @@ function update(
         shieldActive
       ) {
 
-        shieldActive =
-          false;
+        /* Background UFOs do not consume shields. */
 
         ufo.x =
           -200;
@@ -5365,11 +5765,9 @@ function update(
       }
 
       else {
-
-        endGame();
-
-        return;
-
+        ufo.x = -200;
+        createParticles(bird.x, bird.y, "#ff62e6", 18);
+        showToast("🛸 UFO GAVE YOU ROOM!");
       }
 
     }
@@ -5443,7 +5841,7 @@ function update(
           bossShots = [];
           save.bossesDefeated++;
           save.missions.boss3 = Math.min(3, save.bossesDefeated);
-          score += 10;
+          awardBonusScore(10);
           unlockAchievement("boss");
           if (save.bossesDefeated >= 3) unlockAchievement("boss3");
           checkMissionRewards();
@@ -5509,7 +5907,7 @@ function update(
           boss.active =
             false;
 
-          score += 10;
+          awardBonusScore(10);
 
           unlockAchievement(
             "boss"
@@ -5815,22 +6213,62 @@ function drawBackground() {
 
   }
 
-  /*
+    /*
      Shooting stars.
   */
 
-  if (
-    frame % 220 === 0
-  ) {
-
-    createParticles(
-      random(0,W),
-      random(0,H * .65),
-      "#ffffff",
-      2
-    );
-
+  const now = performance.now();
+  if (now >= nextShootingStarAt) {
+    const colors = ["#8deeff", "#ffe28a", "#d7a6ff"];
+    const count = Math.random() < .16 ? 2 : 1;
+    for (let i = 0; i < count; i++) {
+      shootingStars.push({
+        x: random(35, W * .82),
+        y: random(35, H * .55),
+        vx: random(8, 13),
+        vy: random(3.5, 6.5),
+        length: random(70, 145),
+        life: 1,
+        color: pick(colors)
+      });
+    }
+    nextShootingStarAt = now + random(1000, 1900);
   }
+
+  for (const star of shootingStars) {
+    ctx.save();
+    ctx.globalAlpha = star.life;
+    const trail = ctx.createLinearGradient(
+      star.x - star.vx * star.length / 12,
+      star.y - star.vy * star.length / 12,
+      star.x,
+      star.y
+    );
+    trail.addColorStop(0, "rgba(130,170,255,0)");
+    trail.addColorStop(.68, star.color);
+    trail.addColorStop(1, "#ffffff");
+    ctx.strokeStyle = trail;
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = "round";
+    ctx.shadowColor = star.color;
+    ctx.shadowBlur = 13;
+    ctx.beginPath();
+    ctx.moveTo(star.x - star.vx * star.length / 12, star.y - star.vy * star.length / 12);
+    ctx.lineTo(star.x, star.y);
+    ctx.stroke();
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, 2.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    star.x += star.vx;
+    star.y += star.vy;
+    star.life -= .012;
+  }
+  shootingStars = shootingStars.filter(star =>
+    star.life > 0 && star.x < W + 160 && star.y < H + 100
+  );
 
   /*
      Clouds / space fog.
@@ -6135,6 +6573,18 @@ function drawGems() {
       gem.x,
       gem.y
     );
+    if (gem.milestone) {
+      ctx.save();
+      ctx.strokeStyle = "rgba(255,216,77," + (.55 + Math.sin(gem.pulse) * .18) + ")";
+      ctx.lineWidth = 2;
+      ctx.shadowColor = "#ffd84d";
+      ctx.shadowBlur = 18;
+      ctx.beginPath();
+      ctx.arc(0, 0, 24 + Math.sin(gem.pulse) * 2, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
 
     const pulse =
       1 +
@@ -6440,6 +6890,32 @@ function drawMeteors() {
    ============================================================ */
 
 function drawUFOs() {
+
+  for (const craft of ambientUfos) {
+    craft.x -= craft.speed;
+    craft.phase += 0.012;
+    if (craft.x < -38) {
+      craft.x = W + random(55, 230);
+      craft.baseY = random(110, H - 130);
+    }
+
+    ctx.save();
+    ctx.globalAlpha = craft.alpha;
+    ctx.translate(craft.x, craft.baseY + Math.sin(craft.phase) * 12);
+    ctx.scale(craft.scale, craft.scale);
+    ctx.shadowColor = "#70dcff";
+    ctx.shadowBlur = 15;
+    ctx.fillStyle = "#9a83ff";
+    ctx.beginPath();
+    ctx.ellipse(0, 4, 25, 10, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#a5efff";
+    ctx.beginPath();
+    ctx.arc(0, -4, 12, Math.PI, 0);
+    ctx.fill();
+    ctx.restore();
+  }
+
 
   for (
     const ufo of ufos
@@ -7141,13 +7617,13 @@ function draw() {
 
   drawBackground();
 
+  drawUFOs();
+
   drawZoneText();
 
   drawPipes();
 
   drawMeteors();
-
-  drawUFOs();
 
   drawBoss();
   drawBossShots();
@@ -7334,6 +7810,19 @@ function updateUI() {
       ? score
       : "0";
 
+  const gemProgressElement = document.getElementById("gemProgress");
+  if (gemProgressElement) {
+    const nextDiamond = 20 - (score % 20);
+    const milestoneGemAhead = gems.some(gem => gem.milestone && !gem.collected);
+    gemProgressElement.textContent =
+      gameState === "playing"
+        ? milestoneGemAhead
+          ? "💎 MILESTONE DIAMOND AHEAD"
+          : "💎 " + nextDiamond + " TO NEXT DIAMOND"
+        : "💎 GUARANTEED DIAMOND EVERY 20 SCORE";
+    gemProgressElement.classList.toggle("hasGem", milestoneGemAhead);
+    gemProgressElement.style.setProperty("--gem-progress", ((score % 20) / 20) * 100 + "%");
+  }
   const multiplierElement =
     document.getElementById(
       "multiplier"
@@ -7556,6 +8045,155 @@ function revivePlayer() {
    ============================================================ */
 
 
+function sanitizePilotName(value) {
+  const clean = String(value || "")
+    .replace(/[^A-Za-z0-9 _.-]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 16);
+  return clean || "Pilot";
+}
+
+
+function recordLeaderboardScore() {
+  save.playerName = sanitizePilotName(save.playerName);
+  if (!Array.isArray(save.leaderboard)) save.leaderboard = [];
+  if (score <= 0) return null;
+
+  const normalizedName = save.playerName.toLowerCase();
+  let entry = save.leaderboard.find(row =>
+    String(row.name).toLowerCase() === normalizedName
+  );
+
+  if (entry) {
+    entry.name = save.playerName;
+    entry.score = Math.max(Number(entry.score) || 0, score);
+  } else {
+    save.leaderboard.push({ name: save.playerName, score });
+  }
+
+  save.leaderboard.sort((a, b) => b.score - a.score);
+  save.leaderboard = save.leaderboard.slice(0, 10);
+
+  const rank = save.leaderboard.findIndex(row =>
+    String(row.name).toLowerCase() === normalizedName
+  );
+  return rank >= 0 ? rank : null;
+}
+
+
+function getLocalDayKey(dateValue) {
+  const date = dateValue || new Date();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return date.getFullYear() + "-" + month + "-" + day;
+}
+
+
+function canClaimDailyReward() {
+  return save.dailyReward.lastClaimDay !== getLocalDayKey();
+}
+
+
+function updateDailyRewardUI() {
+  const available = canClaimDailyReward();
+  const menuButton = document.getElementById("dailyRewardBtn");
+  const claimButton = document.getElementById("claimDailyRewardBtn");
+  const streak = document.getElementById("dailyRewardStreak");
+  const status = document.getElementById("dailyRewardStatus");
+
+  if (menuButton) {
+    menuButton.textContent = available ? "🎁 DAILY +5 💎" : "✅ CLAIMED TODAY";
+    menuButton.disabled = !available;
+  }
+  if (claimButton) {
+    claimButton.textContent = available ? "CLAIM 5 DIAMONDS" : "CLAIMED TODAY";
+    claimButton.disabled = !available;
+  }
+  if (streak) {
+    streak.textContent = "🔥 " + save.dailyReward.streak + " DAY STREAK";
+  }
+  if (status) {
+    status.textContent = available
+      ? "Your daily diamonds are ready. Claim them before you fly."
+      : "You already claimed today's diamonds. Come back after local midnight.";
+  }
+}
+
+
+function claimDailyReward() {
+  if (!canClaimDailyReward()) {
+    showToast("DAILY REWARD ALREADY CLAIMED");
+    return;
+  }
+
+  const today = getLocalDayKey();
+  const yesterdayDate = new Date();
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+  const yesterday = getLocalDayKey(yesterdayDate);
+
+  save.dailyReward.streak =
+    save.dailyReward.lastClaimDay === yesterday
+      ? save.dailyReward.streak + 1
+      : 1;
+  save.dailyReward.lastClaimDay = today;
+  save.gems += 5;
+  save.totalGems += 5;
+  save.missions.gems10 = Math.min(10, save.missions.gems10 + 5);
+
+  if (save.dailyReward.streak >= 3) unlockAchievement("daily3");
+  if (save.dailyReward.streak >= 7) unlockAchievement("daily7");
+  checkExtendedAchievements();
+  checkMissionRewards();
+  saveGame();
+  updateUI();
+  updateDailyRewardUI();
+  showToast("🎁 DAILY DROP: +5 DIAMONDS");
+}
+
+function renderLeaderboard() {
+  const input = document.getElementById("leaderboardNameInput");
+  const list = document.getElementById("leaderboardList");
+  input.value = save.playerName || "Pilot";
+  list.textContent = "";
+
+  if (!save.leaderboard.length) {
+    const empty = document.createElement("div");
+    empty.className = "leaderboardEmpty";
+    empty.textContent = "No scores yet. Play a run, save your name, and be the first pilot on the board.";
+    list.appendChild(empty);
+    return;
+  }
+
+  save.leaderboard.forEach((entry, index) => {
+    const row = document.createElement("div");
+    const isCurrentPilot =
+      String(entry.name).toLowerCase() === String(save.playerName).toLowerCase();
+    row.className = "leaderboardRow" + (isCurrentPilot ? " currentPilot" : "");
+
+    const rank = document.createElement("div");
+    rank.className = "leaderboardRank";
+    rank.textContent = ["🥇", "🥈", "🥉"][index] || String(index + 1);
+
+    const pilot = document.createElement("div");
+    pilot.className = "leaderboardPilot";
+    pilot.textContent = sanitizePilotName(entry.name);
+    if (isCurrentPilot) {
+      const you = document.createElement("span");
+      you.className = "leaderboardYou";
+      you.textContent = "YOUR PILOT";
+      pilot.appendChild(you);
+    }
+
+    const points = document.createElement("div");
+    points.className = "leaderboardScore";
+    points.textContent = Math.floor(Number(entry.score) || 0) + " PTS";
+
+    row.append(rank, pilot, points);
+    list.appendChild(row);
+  });
+}
+
 document
   .getElementById("playBtn")
   .addEventListener(
@@ -7587,6 +8225,40 @@ document
     goToMenu
   );
 
+
+document.getElementById("leaderboardBtn").addEventListener("click", () => {
+  renderLeaderboard();
+  showPanel("leaderboardPanel");
+});
+
+document.getElementById("gameOverLeaderboardBtn").addEventListener("click", () => {
+  renderLeaderboard();
+  showPanel("leaderboardPanel");
+});
+
+document.getElementById("savePilotNameBtn").addEventListener("click", () => {
+  save.playerName = sanitizePilotName(
+    document.getElementById("leaderboardNameInput").value
+  );
+  saveGame();
+  renderLeaderboard();
+  showToast("PILOT NAME SAVED");
+});
+
+document.getElementById("backLeaderboard").addEventListener("click", () => {
+  showPanel(gameState === "gameover" ? "gameOverPanel" : "menuPanel");
+});
+
+document.getElementById("dailyRewardBtn").addEventListener("click", () => {
+  updateDailyRewardUI();
+  showPanel("dailyRewardPanel");
+});
+
+document.getElementById("claimDailyRewardBtn").addEventListener("click", claimDailyReward);
+
+document.getElementById("backDailyReward").addEventListener("click", () => {
+  showPanel(gameState === "gameover" ? "gameOverPanel" : "menuPanel");
+});
 
 function goToMenu() {
 
@@ -7764,9 +8436,8 @@ function buySkin(
   save.coins -=
     skin.price;
 
-  save.skins.unlocked.push(
-    key
-  );
+  save.skins.unlocked.push(key);
+  checkExtendedAchievements();
 
   save.skins.equipped =
     key;
@@ -8972,6 +9643,7 @@ updateMissionProgress();
 updateDifficultyButton();
 
 updateUI();
+updateDailyRewardUI();
 
 showPanel(
   "menuPanel"
@@ -8979,6 +9651,26 @@ showPanel(
 
 saveGame();
 
+const bootLoader = document.getElementById("bootLoader");
+const bootProgress = document.getElementById("bootProgress");
+const bootStatus = document.getElementById("bootStatus");
+const bootSteps = [
+  [80, 24, "Mapping the stars"],
+  [340, 52, "Waking your pilot"],
+  [620, 79, "Charging the engines"],
+  [900, 100, "Ready for takeoff!"]
+];
+
+bootSteps.forEach(([delay, progress, status]) => {
+  setTimeout(() => {
+    if (bootProgress) bootProgress.style.width = progress + "%";
+    if (bootStatus) bootStatus.textContent = status;
+  }, delay);
+});
+
+setTimeout(() => {
+  if (bootLoader) bootLoader.classList.add("is-hidden");
+}, 1250);
 </script>
 
 </body>
